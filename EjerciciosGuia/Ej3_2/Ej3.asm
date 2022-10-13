@@ -31,7 +31,7 @@ section .bss
 section .text
 
 main:
-   ---------------------------------------
+;   ---------------------------------------
    ;INGRESE EL PRIMER NUMERO Y LO GUARDO EN NUMX
     mov      rdi,msjIngX
     SUB      RSP,8

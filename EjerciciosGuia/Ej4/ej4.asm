@@ -11,10 +11,12 @@ extern sscanf
 
 section 	.data ;Seccion con valores pre establecidos
 	msjaUsuario db "Ingrese 15 numeros",0
-	formatInputFillColl     db "%hi %hi %hi %hi %hi %hi %hi %hi %hi %hi %hi %hi %hi %hi %hi",0
+;	formatInputFillColl     db "%hi %hi %hi %hi %hi %hi %hi %hi %hi %hi %hi %hi %hi %hi %hi",0
+	formatInputFillColl     db "%hi %hi %hi %hi",0
 
 section 	.bss ;Seccion sin valor por defecto
 	numerosInput resw 300
+	vector 	resq 15
 
 section 	.text
 main:
@@ -34,5 +36,11 @@ main:
 ret
 
 validarInput:
-	1
+	mov rdi, numerosInput 
+	mov rsi, formatInputFillColl
+	mov rdx, vector
+	sub rsp,8
+	call sscanf
+	add rsp, 8
+	mov r10, [vector]
 ret
