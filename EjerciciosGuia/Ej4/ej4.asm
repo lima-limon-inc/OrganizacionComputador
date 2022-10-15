@@ -57,9 +57,15 @@ main:
 	mov rax, 1
 	mov [desplaz], rax ;Hashtag Reciclado
 
+	mov rcx, 15
+loopPrint:
+	mov r12, rcx
  	sub rsp, 8
  	call imprimirVector
  	add rsp, 8
+	
+	mov rcx, r12
+	loop loopPrint
 ret
 
 validarInput:
@@ -102,7 +108,6 @@ anadirAVector:
 	inc rbx
 	mov [desplaz], rbx
 	
-	mov r15, [vector + r13]
 ; [ | | | | | | | | | | | | | |  | | | | | | | | | | | ]
 
 ret
@@ -116,6 +121,9 @@ imprimirVector:
 	mov bl, [longElemento] ;Aca longElemento es de 1 byte (por como lo escribimos en .data)
 
 	imul r13, rbx ;me guardo el resultado en el registro 13, y despues lo multiplicopor rbx (que tengo guardado el 64)
+	mov rbx,[desplaz]
+	inc rbx
+	mov [desplaz], rbx
 
 	mov r15, [vector + r13]
 	mov [pivote], r15
