@@ -46,6 +46,8 @@ msjLeyendo db "Leyendo",0
 
 section 	.bss ;Seccion sin valor por defecto
 	registroValido resb 1
+	datoValido resb 1
+	columna resb 1
 
 section 	.text
 main:
@@ -55,13 +57,13 @@ main:
     cmp qword[handle],0 ;COMO NINGUNO DE LOS OPERANDOS ES UN REGISTRO, TENEMOS QUE INDICAR CON QWORD/BYTE/WORD
     jle errorOpen
 
-;    sub rsp, 8
-;    call llenarMatriz
-;    add rsp, 8
-;
-;    sub rsp, 8
-;    call cerrarArchivo
-;    add rsp, 8
+     sub rsp, 8
+     call llenarMatriz
+     add rsp, 8
+ 
+     sub rsp, 8
+     call cerrarArchivo
+     add rsp, 8
 ;
 ;    sub rsp, 8
 ;    call informe
@@ -76,6 +78,13 @@ errorOpen:
     add rsp, 8
 ret
 
+
+cerrarArchivo:
+    mov rdi, [handle]
+    sub rsp, 8
+    call fclose
+    add rsp, 8
+ret
 
 finPrograma:
 ret
@@ -123,9 +132,62 @@ add 	rsp,8
 endOfFile:
 ret
 
+calcularDesplaz: ;formula de matriz 
+	 
+
+ret
+
 
 VALREG:
 	mov 	byte[registroValido],"N"
 
+	sub 	rsp, 8
+	call 	validarEmpresa
+	add 	rsp,8
+	cmp 	byte[datoValido],"N"
+	je 	finValidarRegistro
 
+	sub 	rsp, 8
+	call 	validarBeneficio
+	add 	rsp,8
+	cmp 	byte[datoValido],"N"
+	je 	finValidarRegistro
+
+	mov 	byte[registroValido],"S"
+
+finValidarRegistro:
+ret
+
+validarEmpresa:
+	mov 	byte[datoValido],"N"
+	cmp 	byte[codEmp],1
+	jl 	codEmpInval
+	cmp 	byte[codEmp],10
+	jg 	codEmpInval
+	mov 	byte[datoValido],"S"
+
+codEmpInval:
+ret
+
+validarBeneficio:
+	mov 	byte[datoValido],"S"
+	mov rbx, 0 ;Desplazamiento
+	mov rcx, 5
+	mov byte[columna], 1
+sigBeneficio:
+	push rcx ; Guardo en la pila el contenido de rcx
+	mov rcx,2 ;Vamos a comparar dos cosas
+	mov rsi, beneficio ; lea rsi, [beneficio] iguales
+	lea rdi, [vecBeneficios + rbx] ; Si o si usar lea
+	repe cmpsb
+	pop rcx; agarra el contenido de la pila y lo dejo
+
+	je beneficioValido
+	add rbx, 2
+	inc byte[columna]
+	loop sigBeneficio
+
+	mov 	byte[datoValido],"N"
+	
+codBenInval:
 ret
