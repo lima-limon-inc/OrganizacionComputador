@@ -39,13 +39,15 @@ section 	.data ;Seccion con valores pre establecidos
 
 	vectorBeneficios db "SDKTVETRHF"
 
+	siLoTiene db 1
+	
+	registro 	times 0 db ""
+		codigo 	db 0
+		beneficio times 2 db ""
+
 section 	.bss ;Seccion sin valor por defecto
 	handler resb 1 ;Manejador de archivo
 
-	registro times 0 resb 3
-	codigo resb 1
-	beneficio resb 2
-	
 	fila resb 1
 	columna resb 1
 
@@ -82,22 +84,23 @@ leerBytes:
 	sub rsp, 8
 	call ValidarCodigo ;Esto nos va a devolver en el RAX el handler
 	add rsp, 8
-	cmp [codigoValido], "N"
+	cmp byte[codigoValido], "N"
 	je leerBytes
 	
-	mv rax, [codigo]
-	mv [fila], rax ;El codigo en si mismo es la fila
+	sub rax, rax
+	mov al, byte[codigo]
+	mov byte[fila], al ;El codigo en si mismo es la fila
 
 	sub rsp, 8
 	call ValidarBeneficio ;Esto nos va a devolver en el RAX el handler
 	add rsp, 8
-	cmp [beneficioValido], "N" ;Si no es valido el beneficio, quiero volver a iterar
+	cmp byte[beneficioValido], "N" ;Si no es valido el beneficio, quiero volver a iterar
 	je leerBytes
 
 	; Si llega hasta aca significa que el beneficio es valido, y ya tengo la fila y la columna
 
 	sub rsp, 8
-	call calcularDesplazMatriz ;Esto nos va a devolver en el RAX el handler
+	call calcularDesplazMatriz 
 	add rsp, 8
 	
 ret
@@ -113,26 +116,36 @@ errorContenidoArchivo:
 ret
 
 ValidarCodigo:
-	mov [codigoValido], "N"
-	cmp [codigo], 1
-	jl codigoInvalidoMensaje
+	mov byte[codigoValido], "N"
 
-	cmp [codigo], 10
-	jg codigoInvalidoMensaje
+	sub r15,r15
+	mov r15b, byte[codigo]
+
+	cmp byte[codigo], 1
+	jl errorArchivo
+;	jl codigoInvalidoMensaje
+
+	cmp byte[codigo], 10
+	jg errorArchivo
+;	jg codigoInvalidoMensaje
 	
-	mov [codigoValido], "S"
+	mov byte[codigoValido], "S"
 ret
 
 ValidarBeneficio:
 	mov rcx, 5 ; Hay 5 beneficios habilitados
-	mov [beneficioValido], "S" ;Le pongo valor default que si, si llega al final del loop, significa que el beneficio no estaba en el vector
+	mov byte[beneficioValido], "S" ;Le pongo valor default que si, si llega al final del loop, significa que el beneficio no estaba en el vector
 	sub r12, r12 ; Uso el registro r12 de desplazamiento
-	mov r13, [beneficio]
+	inc r12 ; La posicion inicial es 1
+	imul r12, 2 ; Cada elemento son 2 bytes
+	sub r13, r13
+	mov r13w, word[beneficio]
 	sub r14, r14
 chequearCada2:
 	inc r14 ;Este incremento es para obtener coordenada columna
-	mov [columna], r14
+	mov byte[columna], r14b
 
+	mov r15, [vectorBeneficios + r12]
 	cmp  r13, [vectorBeneficios + r12]
 	je finIteracion
 
@@ -140,14 +153,39 @@ chequearCada2:
 
 	inc r12
 	inc r12 ; Este incremento es para el desplazamiento
+	imul r12, 2 ; Cada elemento son 2 bytes
 
 	loop chequearCada2
 
-	mov [beneficioValido], "N"
+	mov byte[beneficioValido], "N"
 finIteracion:
 ret
 
 calcularDesplazMatriz:
+; (i-1) * longFila + (j-1) * longElemento
+; \______________/   \___________________/
+;        RAX                RBX
+; Calculamos el desplazamiento en dos partes. Una en un registro, la otro en otro y despues lo sumamos (:carita_fachera:)
 ;
+	sub rax, rax
+	mov al, [fila]	
+	dec rax ;Le resto uno ---> i - 1
+	
+	imul rax, 5 ; 5 elementos 1 byte cada uno
+
+	sub rbx, rbx
+	mov bl, [columna]	
+	dec rax ;Le resto uno ---> j - 1
+	
+	imul rbx, 1 ; 5 elementos 1 byte cada uno
+
+	add ax, bx
+	
+	mov rcx, 1
+	mov rsi, siLoTiene
+	lea rdi, [matriz + rax]
+	
+	rep movsb
+
 
 ret
