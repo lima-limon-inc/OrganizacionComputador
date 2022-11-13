@@ -32,6 +32,14 @@ section 	.data ;Seccion con valores pre establecidos
 	;; Procesamiento de archivos
 	mode db "rb", 0
 
+	;; Variables de pasar del archivo al vector
+	tamanoNumero db 1	;Cada numero tiene 1 byte de longitud
+
+	;; Variable de ir de sin signo a signo
+	;; bpfcs db "%o", 0
+	bpfcs db "%hhi", 0
+	aStr db "%s", 0
+
 section 	.bss ;Seccion sin valor por defecto
 
 	;; Funcionamiento del algoritmo
@@ -41,11 +49,24 @@ section 	.bss ;Seccion sin valor por defecto
 	archivoAOrdenar resw 1 	;Aca voy a guardar el nombre del archivo que el usuario quiere ordenar.
 	handle resb 1		;Aca voy a guardar el handler del archivo
 
+	;; Variables de pasar del archivo al vector
+	numero resb 1
+	numeroStr resb 1
+	numeroInt resb 1
+	
+
 section 	.text
 main:
 	sub rsp, 8
 	call bienvenida		;En esta rutina voy a procesar el input que el usuario me diga (voy a verificar si el archivo existe). En esta rutina voy a darle la bienvenida al usuario
 	add rsp,8
+
+	;; Si llego hasta aca tengo el handler del archivo en handle
+
+	sub rsp, 8
+	call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
+	add rsp,8
+
 ret
 
 ;; Rutinas del main	
@@ -79,4 +100,48 @@ bienvenida:
 
 	;; Si llego hasta aca, significa que el archivo existe
 	mov [handle], rax 	;En handle me guardo que paso con la apertura del archivo
+ret
+
+almacenarDatos:
+	sub rsi, rsi 		;Limpio el rsi para poder pasar correctamente el tamanoNumero
+	
+	mov rdi, numero
+	mov sil, byte[tamanoNumero]
+	mov rdx, 1
+	mov rcx, [handle]
+	sub rsp, 8
+	call fread
+	add rsp, 8
+	cmp rax, 0
+	jle EOF
+
+	mov r12b, byte[numero]	;DEBUG para ver que onda
+	
+	;; sub rax, rax
+	;; cmp rax, 0
+	;; je almacenarDatos
+	
+	mov rdi, numero
+	mov rsi, aStr
+	mov rdx, numeroStr
+	sub rsp, 8
+	call sscanf
+	add rsp, 8
+
+	mov r12b, byte[numeroStr];DEBUG para ver que onda
+
+	mov rdi, numeroStr
+	mov rsi, bpfcs
+	mov rdx, numeroInt
+	sub rsp, 8
+	call sscanf
+	add rsp, 8
+
+	mov r12b, byte[numeroInt];DEBUG para ver que onda
+	
+	
+ret
+
+EOF:
+
 ret
