@@ -43,7 +43,7 @@ section 	.data ;Seccion con valores pre establecidos
 	longElemento db 1
 	posActual db 0 
 	minimoActual db 0
-	cantidadElementos db 10	;Este valor lo voy a determinar cuando lea el archivo
+	cantidadElementos db 10	;Este valor lo voy a determinar cuando lea el archivo. 
 
 	;; Variable de ir de sin signo a signo
 	;; bpfcs db "%o", 0
@@ -53,7 +53,7 @@ section 	.data ;Seccion con valores pre establecidos
 section 	.bss ;Seccion sin valor por defecto
 
 	;; Funcionamiento del algoritmo
-	ordenarMayor resb 1 	;Aca voy a reservar 1 o 0, 1 --> Mayor; 0 ---> Menor 
+	ordenarMayor resb 1 	;Aca voy a reservar 1 o 0, 1 --> Ascendente ; 0 ---> Descendente 
 
 	;; Variables de los archivos
 	archivoAOrdenar resw 1 	;Aca voy a guardar el nombre del archivo que el usuario quiere ordenar.
@@ -204,23 +204,60 @@ EOF:
 ret
 
 algoritmoDeOrdenamiento:
+
+	sub r13, r13 		;Limpio el registro 13 para mas adelante. TODO: Mejor solucion?
+	
+	sub rcx, rcx
+	mov cl, byte[cantidadElementos]
+desplazamiento:	
 	;; Calcular desplazamiento en un vector (i - 1) * longElemento
 
-	sub rax, rax		;\
-	inc byte[posActual]	; \
-	mov al, [posActual]	; /
-	dec rax			;/
+	sub rax, rax		; Esta parte se encarga del i - 1
+	inc byte[posActual]	;
+	mov al, [posActual]	;
+	dec rax			;
 
-	sub rbx, rbx		;\
-	mov bl, [longElemento]	; --> (i-1) * longElemento
-	imul rax, rbx		;/
+	sub rbx, rbx		; Esta parte se encarga del (i-1) * longElemento
+	mov bl, [longElemento]	;
+	imul rax, rbx		;
 
-	sub r12, r12
-	mov r12b, [vector + rax]
+	sub r12, r12		;Esto me deja el item del vector en r12
+	mov r12b, [vector + rax];
+
+	;; Si llego aca, tengo en el r12 el valor actual
+	sub rsp, 8
+	call FuncionDeComparacion
+	add rsp, 8
+
+	
+	loop desplazamiento
 buscarElSwap:	
 
 	
 ret
 
-TEST:
+
+	
+	;; FUNCIONES AUXILIARES
+FuncionDeComparacion: 		;Compara los registros rax y rbx y devuelve el correspondiente (segun el funcionamiento del programa) en el r13
+	mov r15, [ordenarMayor]
+	cmp r15, 1 		;Si esto es 1, quiero ascendente
+	je ComparacionAscendete
+
+	;; Si llego hasta aca, quiero ordenar descendete
+
+	jmp ComparacionDescendente ;TODO: Hacer Descendente
+ComparacionAscendete:	
+	cmp r13, r12
+	jg actualizarNuevo
+
+	;; Si llego hasta aca, signfica que no quiero actualizar nada
+	jmp FinComparacion
+ComparacionDescendente:
+
+
+actualizarNuevo:
+	mov r13, r12
+	
+FinComparacion:	
 ret
