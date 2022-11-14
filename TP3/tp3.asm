@@ -35,6 +35,13 @@ section 	.data ;Seccion con valores pre establecidos
 	;; Variables de pasar del archivo al vector
 	tamanoNumero db 1	;Cada numero tiene 1 byte de longitud
 
+	;; Vector
+	vector db 5,80,50,1,18,19,65,1,8,11
+	longElemento db 1
+	posActual db 0 
+	minimoActual db 0
+	cantidadElementos db 10	;Este valor lo voy a determinar cuando lea el archivo
+
 	;; Variable de ir de sin signo a signo
 	;; bpfcs db "%o", 0
 	bpfcs db "%hhi", 0
@@ -57,15 +64,19 @@ section 	.bss ;Seccion sin valor por defecto
 
 section 	.text
 main:
-	sub rsp, 8
-	call bienvenida		;En esta rutina voy a procesar el input que el usuario me diga (voy a verificar si el archivo existe). En esta rutina voy a darle la bienvenida al usuario
-	add rsp,8
+	;; sub rsp, 8
+	;; call bienvenida		;En esta rutina voy a procesar el input que el usuario me diga (voy a verificar si el archivo existe). En esta rutina voy a darle la bienvenida al usuario
+	;; add rsp,8
 
 	;; Si llego hasta aca tengo el handler del archivo en handle
 
+	;; sub rsp, 8
+	;; call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
+	;; add rsp,8
+
 	sub rsp, 8
-	call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
-	add rsp,8
+	call algoritmoDeOrdenamiento
+	add rsp, 8
 
 ret
 
@@ -116,6 +127,8 @@ almacenarDatos:
 	jle EOF
 
 	mov r12b, byte[numero]	;DEBUG para ver que onda
+
+	;; HASTA ACA FUNCIONA
 	
 	;; sub rax, rax
 	;; cmp rax, 0
@@ -138,11 +151,29 @@ almacenarDatos:
 	add rsp, 8
 
 	mov r12b, byte[numeroInt];DEBUG para ver que onda
-	
-	
 ret
 
 EOF:
-AMONGUS
 ret
 
+algoritmoDeOrdenamiento:
+	;; Calcular desplazamiento en un vector (i - 1) * longElemento
+
+	sub rax, rax		;\
+	inc byte[posActual]	; \
+	mov al, [posActual]	; /
+	dec rax			;/
+
+	sub rbx, rbx		;\
+	mov bl, [longElemento]	; --> (i-1) * longElemento
+	imul rax, rbx		;/
+
+	sub r12, r12
+	mov r12b, [vector + rax]
+buscarElSwap:	
+
+	
+ret
+
+TEST:
+ret
