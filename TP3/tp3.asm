@@ -28,12 +28,22 @@ section 	.data ;Seccion con valores pre establecidos
 	;; Mensajes para la pantalla
 	msjPedirArchivo db "Bienvenido al Ordenador 3000 Ultra, necesito que me indiques que archivo queres que ordene.", 0
 	msjErrorNoExisteArchivo db "ERROR: El archivo ingresado no existe, por favor ingresar un archivo presente en el directorio actual", 0
+	
+	msjMayorOMenor db "Como queres que ordene tu archivo? De manera ascendenteo (1) descendente (0)?", 0
+	msjRtaInvalida db "ERROR: Rta invalida, por favor responder 1 o 0", 0
 
 	;; Procesamiento de archivos
 	mode db "rb", 0
 
 	;; Variables de pasar del archivo al vector
 	tamanoNumero db 1	;Cada numero tiene 1 byte de longitud
+
+	;; Vector
+	vector db 5,80,50,1,18,19,65,1,8,11
+	longElemento db 1
+	posActual db 0 
+	minimoActual db 0
+	cantidadElementos db 10	;Este valor lo voy a determinar cuando lea el archivo
 
 	;; Variable de ir de sin signo a signo
 	;; bpfcs db "%o", 0
@@ -57,15 +67,23 @@ section 	.bss ;Seccion sin valor por defecto
 
 section 	.text
 main:
+	;; sub rsp, 8
+	;; call bienvenida		;En esta rutina voy a procesar el input que el usuario me diga (voy a verificar si el archivo existe). En esta rutina voy a darle la bienvenida al usuario
+	;; add rsp,8
+
+	;; ;; Si llego hasta aca tengo el handler del archivo en handle
+	
 	sub rsp, 8
-	call bienvenida		;En esta rutina voy a procesar el input que el usuario me diga (voy a verificar si el archivo existe). En esta rutina voy a darle la bienvenida al usuario
+	call pedirFuncionamiento
 	add rsp,8
 
-	;; Si llego hasta aca tengo el handler del archivo en handle
+	;; sub rsp, 8
+	;; call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
+	;; add rsp,8
 
 	sub rsp, 8
-	call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
-	add rsp,8
+	call algoritmoDeOrdenamiento
+	add rsp, 8
 
 ret
 
@@ -102,6 +120,46 @@ bienvenida:
 	mov [handle], rax 	;En handle me guardo que paso con la apertura del archivo
 ret
 
+inputInvalido:
+	mov rdi, msjRtaInvalida
+	sub rsp, 8
+	call puts
+	add rsp, 8
+
+pedirFuncionamiento:	
+	mov rdi, msjMayorOMenor
+	sub rsp, 8
+	call puts
+	add rsp, 8
+
+	mov rdi, ordenarMayor ;El usuario ingresa el archivo que quiere ordenar
+	sub rsp, 8
+	call gets
+	add rsp, 8
+
+	mov rdi, ordenarMayor
+	mov rsi, bpfcs
+	mov rdx, ordenarMayor 	;Lo guardo en la misma variable
+	sub rsp, 8
+	call sscanf
+	add rsp, 8
+
+	sub rax, rax
+	mov al, byte[ordenarMayor]
+	
+	cmp rax, 1
+	je inputValido
+
+	cmp rax, 0
+	je inputValido
+
+	jmp inputInvalido 	;Si llegue hasta aca abajo significa que el usuario no escribio ni 1 ni 0
+	
+inputValido:	
+ret
+	
+
+
 almacenarDatos:
 	sub rsi, rsi 		;Limpio el rsi para poder pasar correctamente el tamanoNumero
 	
@@ -116,6 +174,8 @@ almacenarDatos:
 	jle EOF
 
 	mov r12b, byte[numero]	;DEBUG para ver que onda
+
+	;; HASTA ACA FUNCIONA
 	
 	;; sub rax, rax
 	;; cmp rax, 0
@@ -138,10 +198,29 @@ almacenarDatos:
 	add rsp, 8
 
 	mov r12b, byte[numeroInt];DEBUG para ver que onda
-	
-	
 ret
 
 EOF:
+ret
 
+algoritmoDeOrdenamiento:
+	;; Calcular desplazamiento en un vector (i - 1) * longElemento
+
+	sub rax, rax		;\
+	inc byte[posActual]	; \
+	mov al, [posActual]	; /
+	dec rax			;/
+
+	sub rbx, rbx		;\
+	mov bl, [longElemento]	; --> (i-1) * longElemento
+	imul rax, rbx		;/
+
+	sub r12, r12
+	mov r12b, [vector + rax]
+buscarElSwap:	
+
+	
+ret
+
+TEST:
 ret
