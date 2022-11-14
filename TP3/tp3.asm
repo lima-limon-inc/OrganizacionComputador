@@ -28,6 +28,9 @@ section 	.data ;Seccion con valores pre establecidos
 	;; Mensajes para la pantalla
 	msjPedirArchivo db "Bienvenido al Ordenador 3000 Ultra, necesito que me indiques que archivo queres que ordene.", 0
 	msjErrorNoExisteArchivo db "ERROR: El archivo ingresado no existe, por favor ingresar un archivo presente en el directorio actual", 0
+	
+	msjMayorOMenor db "Como queres que ordene tu archivo? De manera ascendenteo (1) descendente (0)?", 0
+	msjRtaInvalida db "ERROR: Rta invalida, por favor responder 1 o 0", 0
 
 	;; Procesamiento de archivos
 	mode db "rb", 0
@@ -68,7 +71,11 @@ main:
 	;; call bienvenida		;En esta rutina voy a procesar el input que el usuario me diga (voy a verificar si el archivo existe). En esta rutina voy a darle la bienvenida al usuario
 	;; add rsp,8
 
-	;; Si llego hasta aca tengo el handler del archivo en handle
+	;; ;; Si llego hasta aca tengo el handler del archivo en handle
+	
+	sub rsp, 8
+	call pedirFuncionamiento
+	add rsp,8
 
 	;; sub rsp, 8
 	;; call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
@@ -112,6 +119,46 @@ bienvenida:
 	;; Si llego hasta aca, significa que el archivo existe
 	mov [handle], rax 	;En handle me guardo que paso con la apertura del archivo
 ret
+
+inputInvalido:
+	mov rdi, msjRtaInvalida
+	sub rsp, 8
+	call puts
+	add rsp, 8
+
+pedirFuncionamiento:	
+	mov rdi, msjMayorOMenor
+	sub rsp, 8
+	call puts
+	add rsp, 8
+
+	mov rdi, ordenarMayor ;El usuario ingresa el archivo que quiere ordenar
+	sub rsp, 8
+	call gets
+	add rsp, 8
+
+	mov rdi, ordenarMayor
+	mov rsi, bpfcs
+	mov rdx, ordenarMayor 	;Lo guardo en la misma variable
+	sub rsp, 8
+	call sscanf
+	add rsp, 8
+
+	sub rax, rax
+	mov al, byte[ordenarMayor]
+	
+	cmp rax, 1
+	je inputValido
+
+	cmp rax, 0
+	je inputValido
+
+	jmp inputInvalido 	;Si llegue hasta aca abajo significa que el usuario no escribio ni 1 ni 0
+	
+inputValido:	
+ret
+	
+
 
 almacenarDatos:
 	sub rsi, rsi 		;Limpio el rsi para poder pasar correctamente el tamanoNumero
