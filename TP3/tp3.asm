@@ -39,7 +39,7 @@ section 	.data ;Seccion con valores pre establecidos
 	tamanoNumero db 1	;Cada numero tiene 1 byte de longitud
 
 	;; Vector
-	vector db 5,80,50,1,18,19,65,1,8,11
+	vector db 5,30,50,2,18,19,65,2,8,1
 	longElemento db 1
 	posActual db 0 
 	minimoActual db 0
@@ -203,9 +203,13 @@ ret
 EOF:
 ret
 
+
+
+	
 algoritmoDeOrdenamiento:
 
 	sub r13, r13 		;Limpio el registro 13 para mas adelante. TODO: Mejor solucion?
+	mov r15, "Pp"		;Pp --> Primer corrida, en la primera corrida tengo que guardar el primer elemento del vector
 	
 	sub rcx, rcx
 	mov cl, byte[cantidadElementos]
@@ -231,6 +235,17 @@ desplazamiento:
 
 	
 	loop desplazamiento
+
+	;; Aca hago el SWAP
+	sub rax, rax
+	mov al, byte[cantidadElementos]
+	
+	dec byte[cantidadElementos] ;Si llego aca ya encontre el swapeo
+	sub rbx, rbc
+	mov bl, byte[cantidadElementos]
+
+	
+	call gets
 buscarElSwap:	
 
 	
@@ -239,7 +254,14 @@ ret
 
 	
 	;; FUNCIONES AUXILIARES
+primeraCorrida:	
+	mov r13, r12
+	sub r15, r15
+	
 FuncionDeComparacion: 		;Compara los registros rax y rbx y devuelve el correspondiente (segun el funcionamiento del programa) en el r13
+	cmp r15, "Pp"
+	je primeraCorrida
+
 	mov r15, [ordenarMayor]
 	cmp r15, 1 		;Si esto es 1, quiero ascendente
 	je ComparacionAscendete
