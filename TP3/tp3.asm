@@ -27,7 +27,7 @@ section 	.data ;Seccion con valores pre establecidos
 
 	;; Mensajes para la pantalla
 	msjPedirArchivo db "Bienvenido al Ordenador 3000 Ultra, necesito que me indiques que archivo queres que ordene.", 0
-	msjErrorNoExisteArchivo db "ERROR: El archivo ingresado no existe, por favor ingresar un archivo presente en el directorio actual", 0
+	msjErrorNoExisteArchivo db "ERROR: El archivo ingresado no existe, por fvor ingresar un archivo presente en el directorio actual", 0
 	
 	msjMayorOMenor db "Como queres que ordene tu archivo? De manera ascendenteo (1) descendente (0)?", 0
 	msjRtaInvalida db "ERROR: Rta invalida, por favor responder 1 o 0", 0
@@ -42,8 +42,8 @@ section 	.data ;Seccion con valores pre establecidos
 	vector db 5,30,50,2,18,19,65,2,8,1
 	longElemento db 1
 	posActual db 0 
-	minimoActual db 0
-	cantidadElementos db 10	;Este valor lo voy a determinar cuando lea el archivo. 
+	posACambiar db 0
+	cantidadElementos db 10	;Este valor lo voy a determinar cuando lea el archivo. TODO
 
 	;; Variable de ir de sin signo a signo
 	;; bpfcs db "%o", 0
@@ -213,18 +213,17 @@ algoritmoDeOrdenamiento:
 	
 	sub rcx, rcx
 	mov cl, byte[cantidadElementos]
-desplazamiento:	
-	;; Calcular desplazamiento en un vector (i - 1) * longElemento
 
-	sub rax, rax		; Esta parte se encarga del i - 1
-	inc byte[posActual]	;
-	mov al, [posActual]	;
-	dec rax			;
+iteracion:	
+	sub rbx,  rbx
+	mov bl, byte[posActual]	;Dejo en rbx la posicion actual para la funcion desplazamiento
+	
+	sub rsp, 8
+	call desplazamiento
+	add rsp, 8
 
-	sub rbx, rbx		; Esta parte se encarga del (i-1) * longElemento
-	mov bl, [longElemento]	;
-	imul rax, rbx		;
-
+	mov byte[posActual], bl
+	
 	sub r12, r12		;Esto me deja el item del vector en r12
 	mov r12b, [vector + rax];
 
@@ -234,14 +233,15 @@ desplazamiento:
 	add rsp, 8
 
 	
-	loop desplazamiento
-
+	loop iteracion
+	;; Aca deberia tener en r13 el valor minimo/maximo
+	
 	;; Aca hago el SWAP
 	sub rax, rax
 	mov al, byte[cantidadElementos]
 	
 	dec byte[cantidadElementos] ;Si llego aca ya encontre el swapeo
-	sub rbx, rbc
+	sub rbx, rbx
 	mov bl, byte[cantidadElementos]
 
 	
@@ -254,6 +254,7 @@ ret
 
 	
 	;; FUNCIONES AUXILIARES
+	;; Funcion que calcula si tengo que 
 primeraCorrida:	
 	mov r13, r12
 	sub r15, r15
@@ -282,4 +283,18 @@ actualizarNuevo:
 	mov r13, r12
 	
 FinComparacion:	
+ret
+
+	;; Funcion que calcula el desplazamieno
+desplazamiento:			;Esta funcion me deja en el rax el desplazamiento que quiero. Recibe en el registro rbx la posicion actual
+	;; Calcular desplazamiento en un vector (i - 1) * longElemento
+
+	sub rax, rax		; Esta parte se encarga del i - 1
+	inc rbx
+	mov rax, rbx
+	dec rax			;
+
+	sub rbp, rbp		; Esta parte se encarga del (i-1) * longElemento
+	mov bpl, [longElemento]	;
+	imul rax, rbp		;
 ret
