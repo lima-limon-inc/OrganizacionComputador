@@ -237,6 +237,13 @@ iteracion:
 	;; Aca deberia tener en r13 el valor minimo/maximo
 	
 	;; Aca hago el SWAP
+	sub rbx, rbx
+	mov rbx, 0
+
+
+
+
+	
 	sub rax, rax
 	mov al, byte[cantidadElementos]
 	
@@ -259,7 +266,7 @@ primeraCorrida:
 	mov r13, r12
 	sub r15, r15
 	
-FuncionDeComparacion: 		;Compara los registros rax y rbx y devuelve el correspondiente (segun el funcionamiento del programa) en el r13
+FuncionDeComparacion: 		;Compara los registros rax y rbx y devuelve el correspondiente (segun el funcionamiento del programa) en el r13. TODO: QUE SOLO USE LA PARTE DE LOS 8 BITS
 	cmp r15, "Pp"
 	je primeraCorrida
 
