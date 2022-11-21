@@ -165,6 +165,7 @@ pedirFuncionamiento:
 	sub rax, rax
 	mov al, byte[ordenarMayor]
 	
+
 	cmp rax, 1
 	je inputValido
 
