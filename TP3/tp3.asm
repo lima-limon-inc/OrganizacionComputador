@@ -234,22 +234,11 @@ algoritmoDeOrdenamiento:
 	mov cl, byte[cantidadElementos] ;TODOTODO: Sumar pos actual restar cantidad de Elementos
 
 iteracion:	
-	sub rbx,  rbx
-	mov bl, byte[posActual]	;Dejo en rbx la posicion actual para la funcion desplazamiento
-	
-	sub rsp, 8
-	call desplazamiento 	;Me devuelve en el rax el desplazamiento requerido
-	add rsp, 8
 
-	mov byte[posActual], bl ;Actualizo la posicion actual que me devuelve desplazamiento 
-	
-	sub r12, r12		;Esto me deja el item del vector en r12
-	mov r12b, [vector + rax];
-
-	;; Si llego aca, tengo en el r12 el valor actual
 	sub rsp, 8
-	call FuncionDeComparacion
+	call buscarElMinimo
 	add rsp, 8
+	
 
 
 	
@@ -288,12 +277,28 @@ iteracion:
 
 	
 	;; call gets
-buscarElSwap:	
-
-	
 ret
 
+buscarElMinimo:	
+	
+	sub rbx,  rbx
+	mov bl, byte[posActual]	;Dejo en rbx la posicion actual para la funcion desplazamiento
+	
+	sub rsp, 8
+	call desplazamiento 	;Me devuelve en el rax el desplazamiento requerido
+	add rsp, 8
 
+	mov byte[posActual], bl ;Actualizo la posicion actual que me devuelve desplazamiento 
+	
+	sub r12, r12		;Esto me deja el item del vector en r12
+	mov r12b, [vector + rax];
+
+	;; Si llego aca, tengo en el r12 el valor actual
+	sub rsp, 8
+	call FuncionDeComparacion
+	add rsp, 8
+
+ret
 	
 	;; FUNCIONES AUXILIARES
 	;; Funcion que calcula si tengo que 
