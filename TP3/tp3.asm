@@ -34,6 +34,7 @@ section 	.data ;Seccion con valores pre establecidos
 
 	msjVerVectorInfo db "Vector: ",0
 	msjVerVector db " %hhi ", 0
+	msjAntesOrd db "Vector antes de ser ordenado: ",0
 	;; msjVerVector db "%hhi", 0
 
 	;; Procesamiento de archivos
@@ -43,17 +44,19 @@ section 	.data ;Seccion con valores pre establecidos
 	tamanoNumero db 1	;Cada numero tiene 1 byte de longitud
 
 	;; Vector
-	vector db 4,30,50,2,18,19,65,2,8,1
-	longVector db 10
+	vector db 4,30,50,2,18,19,65,1,2,8,90,70
 	longElemento db 1
 	posActual db 0 
 	posACambiar db 0
-	cantidadElementos db 10	;Este valor lo voy a determinar cuando lea el archivo. TODO
+	cantidadElementos db 12	;Este valor lo voy a determinar cuando lea el archivo. TODO
 
 	;; Variable de ir de sin signo a signo
 	;; bpfcs db "%o", 0
 	bpfcs db "%hhi", 0
 	aStr db "%s", 0
+
+	;; Variables del ordenamiento
+	corrida db 0
 
 section 	.bss ;Seccion sin valor por defecto
 
@@ -79,20 +82,26 @@ main:
 	;; ;; Si llego hasta aca tengo el handler del archivo en handle
 
 	sub rsp, 8
-	call imprimirVector
-	add rsp, 8
+	call pedirFuncionamiento
+	add rsp,8
+
 	
-	;; sub rsp, 8
-	;; call pedirFuncionamiento
-	;; add rsp,8
+	sub rsp, 8		;Muestro como se ve el vector antes de ordenarlo
+	mov rdi, msjAntesOrd
+	call puts
+	add rsp,8
+
+	sub rsp, 8
+	call imprimirVector		
+	add rsp,8
 
 	;; ;; sub rsp, 8
 	;; ;; call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
 	;; ;; add rsp,8
 
-	;; sub rsp, 8
-	;; call algoritmoDeOrdenamiento
-	;; add rsp, 8
+	sub rsp, 8
+	call algoritmoDeOrdenamiento
+	add rsp, 8
 
 ret
 
@@ -241,27 +250,43 @@ iteracion:
 	call FuncionDeComparacion
 	add rsp, 8
 
+
 	
 	loop iteracion
 	;; Aca deberia tener en r13 el valor minimo/maximo
 	
 	;; Aca hago el SWAP
 	sub rbx, rbx
-	mov rbx, 0
+	mov bl, byte[corrida]
+
+	mov rax, r13
+	sub r13, r13
+	mov r13b, [vector + rbx]
+	
+	mov r8b, [posACambiar] 
+	mov [vector + r8], r13b
+	
+	mov [vector + rbx], al
+
+	sub rsp, 8
+	call imprimirVector
+	add rsp, 8
+	;; sub rbx, rbx
+	;; mov rbx, 0
 
 
 
 
 	
-	sub rax, rax
-	mov al, byte[cantidadElementos]
+	;; sub rax, rax
+	;; mov al, byte[cantidadElementos]
 	
-	dec byte[cantidadElementos] ;Si llego aca ya encontre el swapeo
-	sub rbx, rbx
-	mov bl, byte[cantidadElementos]
+	;; dec byte[cantidadElementos] ;Si llego aca ya encontre el swapeo
+	;; sub rbx, rbx
+	;; mov bl, byte[cantidadElementos]
 
 	
-	call gets
+	;; call gets
 buscarElSwap:	
 
 	
@@ -297,6 +322,9 @@ ComparacionDescendente:
 
 actualizarNuevo:
 	mov r13, r12
+	mov r8b, byte[posActual]
+	mov byte[posACambiar], r8b
+	dec byte[posACambiar]	;Correcion TODO: Chequear
 	
 FinComparacion:	
 ret
@@ -315,20 +343,23 @@ desplazamiento:			;Esta funcion me deja en el rax el desplazamiento que quiero. 
 	imul rax, rbp		;
 ret
 
-imprimirVector:	
+
+	;; Rutina que se encarga de imprimir el vector
+imprimirVector:			;TODO: No imprime el ultimo elemento
 	mov rdi, msjVerVectorInfo
 	sub rsp, 8
 	call puts
 	add rsp,8
 
 	
-	mov r12b, byte[longVector]
+	mov r12b, byte[cantidadElementos]
+	;; inc r12 		;Sumamos uno porque sino solo hace 9 corridas
 loopImpresion:	
 	mov rcx, r12
 
 	mov r14, r12
 	sub r13, r13
-	mov r13b, byte[longVector]
+	mov r13b, byte[cantidadElementos]
 	sub r13, r14
 	
 
