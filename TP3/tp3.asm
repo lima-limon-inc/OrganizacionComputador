@@ -27,10 +27,15 @@ section 	.data ;Seccion con valores pre establecidos
 
 	;; Mensajes para la pantalla
 	msjPedirArchivo db "Bienvenido al Ordenador 3000 Ultra, necesito que me indiques que archivo queres que ordene.", 0
-	msjErrorNoExisteArchivo db "ERROR: El archivo ingresado no existe, por favor ingresar un archivo presente en el directorio actual", 0
+	msjErrorNoExisteArchivo db "ERROR: El archivo ingresado no existe, por fvor ingresar un archivo presente en el directorio actual", 0
 	
 	msjMayorOMenor db "Como queres que ordene tu archivo? De manera ascendenteo (1) descendente (0)?", 0
 	msjRtaInvalida db "ERROR: Rta invalida, por favor responder 1 o 0", 0
+
+	msjVerVectorInfo db "Vector: ",0
+	msjVerVector db " %hhi ", 0
+	msjAntesOrd db "Vector antes de ser ordenado: ",0
+	;; msjVerVector db "%hhi", 0
 
 	;; Procesamiento de archivos
 	mode db "rb", 0
@@ -39,21 +44,24 @@ section 	.data ;Seccion con valores pre establecidos
 	tamanoNumero db 1	;Cada numero tiene 1 byte de longitud
 
 	;; Vector
-	vector db 5,80,50,1,18,19,65,1,8,11
+	vector db 4,30,50,2,18,19,65,1,2,8,90,70
 	longElemento db 1
 	posActual db 0 
-	minimoActual db 0
-	cantidadElementos db 10	;Este valor lo voy a determinar cuando lea el archivo
+	posACambiar db 0
+	cantidadElementos db 12	;Este valor lo voy a determinar cuando lea el archivo. TODO
 
 	;; Variable de ir de sin signo a signo
 	;; bpfcs db "%o", 0
 	bpfcs db "%hhi", 0
 	aStr db "%s", 0
 
+	;; Variables del ordenamiento
+	corrida db 0
+
 section 	.bss ;Seccion sin valor por defecto
 
 	;; Funcionamiento del algoritmo
-	ordenarMayor resb 1 	;Aca voy a reservar 1 o 0, 1 --> Mayor; 0 ---> Menor 
+	ordenarMayor resb 1 	;Aca voy a reservar 1 o 0, 1 --> Ascendente ; 0 ---> Descendente 
 
 	;; Variables de los archivos
 	archivoAOrdenar resw 1 	;Aca voy a guardar el nombre del archivo que el usuario quiere ordenar.
@@ -72,14 +80,24 @@ main:
 	;; add rsp,8
 
 	;; ;; Si llego hasta aca tengo el handler del archivo en handle
-	
+
 	sub rsp, 8
 	call pedirFuncionamiento
 	add rsp,8
 
-	;; sub rsp, 8
-	;; call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
-	;; add rsp,8
+	
+	sub rsp, 8		;Muestro como se ve el vector antes de ordenarlo
+	mov rdi, msjAntesOrd
+	call puts
+	add rsp,8
+
+	sub rsp, 8
+	call imprimirVector		
+	add rsp,8
+
+	;; ;; sub rsp, 8
+	;; ;; call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
+	;; ;; add rsp,8
 
 	sub rsp, 8
 	call algoritmoDeOrdenamiento
@@ -203,24 +221,164 @@ ret
 EOF:
 ret
 
+
+
+	
 algoritmoDeOrdenamiento:
-	;; Calcular desplazamiento en un vector (i - 1) * longElemento
 
-	sub rax, rax		;\
-	inc byte[posActual]	; \
-	mov al, [posActual]	; /
-	dec rax			;/
+	sub r13, r13 		;Limpio el registro 13 para mas adelante. TODO: Mejor solucion?
+	mov r15, "Pp"		;Pp --> Primer corrida, en la primera corrida tengo que guardar el primer elemento del vector
+	
+	sub rcx, rcx
+	mov cl, byte[cantidadElementos]
 
-	sub rbx, rbx		;\
-	mov bl, [longElemento]	; --> (i-1) * longElemento
-	imul rax, rbx		;/
+iteracion:	
+	sub rbx,  rbx
+	mov bl, byte[posActual]	;Dejo en rbx la posicion actual para la funcion desplazamiento
+	
+	sub rsp, 8
+	call desplazamiento
+	add rsp, 8
 
-	sub r12, r12
-	mov r12b, [vector + rax]
+	mov byte[posActual], bl
+	
+	sub r12, r12		;Esto me deja el item del vector en r12
+	mov r12b, [vector + rax];
+
+	;; Si llego aca, tengo en el r12 el valor actual
+	sub rsp, 8
+	call FuncionDeComparacion
+	add rsp, 8
+
+
+	
+	loop iteracion
+	;; Aca deberia tener en r13 el valor minimo/maximo
+	
+	;; Aca hago el SWAP
+	sub rbx, rbx
+	mov bl, byte[corrida]
+
+	mov rax, r13
+	sub r13, r13
+	mov r13b, [vector + rbx]
+	
+	mov r8b, [posACambiar] 
+	mov [vector + r8], r13b
+	
+	mov [vector + rbx], al
+
+	sub rsp, 8
+	call imprimirVector
+	add rsp, 8
+	;; sub rbx, rbx
+	;; mov rbx, 0
+
+
+
+
+	
+	;; sub rax, rax
+	;; mov al, byte[cantidadElementos]
+	
+	;; dec byte[cantidadElementos] ;Si llego aca ya encontre el swapeo
+	;; sub rbx, rbx
+	;; mov bl, byte[cantidadElementos]
+
+	
+	;; call gets
 buscarElSwap:	
 
 	
 ret
 
-TEST:
+
+	
+	;; FUNCIONES AUXILIARES
+	;; Funcion que calcula si tengo que 
+primeraCorrida:	
+	mov r13, r12
+	sub r15, r15
+	
+FuncionDeComparacion: 		;Compara los registros rax y rbx y devuelve el correspondiente (segun el funcionamiento del programa) en el r13. TODO: QUE SOLO USE LA PARTE DE LOS 8 BITS
+	cmp r15, "Pp"
+	je primeraCorrida
+
+	mov r15, [ordenarMayor]
+	cmp r15, 1 		;Si esto es 1, quiero ascendente
+	je ComparacionAscendete
+
+	;; Si llego hasta aca, quiero ordenar descendete
+
+	jmp ComparacionDescendente ;TODO: Hacer Descendente
+ComparacionAscendete:	
+	cmp r13, r12
+	jg actualizarNuevo
+
+	;; Si llego hasta aca, signfica que no quiero actualizar nada
+	jmp FinComparacion
+ComparacionDescendente:
+
+
+actualizarNuevo:
+	mov r13, r12
+	mov r8b, byte[posActual]
+	mov byte[posACambiar], r8b
+	dec byte[posACambiar]	;Correcion TODO: Chequear
+	
+FinComparacion:	
+ret
+
+	;; Funcion que calcula el desplazamieno
+desplazamiento:			;Esta funcion me deja en el rax el desplazamiento que quiero. Recibe en el registro rbx la posicion actual
+	;; Calcular desplazamiento en un vector (i - 1) * longElemento
+
+	sub rax, rax		; Esta parte se encarga del i - 1
+	inc rbx
+	mov rax, rbx
+	dec rax			;
+
+	sub rbp, rbp		; Esta parte se encarga del (i-1) * longElemento
+	mov bpl, [longElemento]	;
+	imul rax, rbp		;
+ret
+
+
+	;; Rutina que se encarga de imprimir el vector
+imprimirVector:			;TODO: No imprime el ultimo elemento
+	mov rdi, msjVerVectorInfo
+	sub rsp, 8
+	call puts
+	add rsp,8
+
+	
+	mov r12b, byte[cantidadElementos]
+	;; inc r12 		;Sumamos uno porque sino solo hace 9 corridas
+loopImpresion:	
+	mov rcx, r12
+
+	mov r14, r12
+	sub r13, r13
+	mov r13b, byte[cantidadElementos]
+	sub r13, r14
+	
+
+	mov rbx, r13
+	sub rsp, 8
+	call desplazamiento
+	add rsp, 8
+
+
+	
+	mov rdi, msjVerVector
+	mov rsi, [vector + rax]
+	sub rsp, 8
+	call printf
+	add rsp, 8
+
+	dec r12
+	mov rcx, r12
+	loop loopImpresion
+
+	
 ret
