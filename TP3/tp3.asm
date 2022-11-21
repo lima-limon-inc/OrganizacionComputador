@@ -32,6 +32,10 @@ section 	.data ;Seccion con valores pre establecidos
 	msjMayorOMenor db "Como queres que ordene tu archivo? De manera ascendenteo (1) descendente (0)?", 0
 	msjRtaInvalida db "ERROR: Rta invalida, por favor responder 1 o 0", 0
 
+	msjVerVectorInfo db "Vector: ",0
+	msjVerVector db "%hhi", 0
+	;; msjVerVector db "%hhi", 0
+
 	;; Procesamiento de archivos
 	mode db "rb", 0
 
@@ -39,7 +43,8 @@ section 	.data ;Seccion con valores pre establecidos
 	tamanoNumero db 1	;Cada numero tiene 1 byte de longitud
 
 	;; Vector
-	vector db 5,30,50,2,18,19,65,2,8,1
+	vector db 4,30,50,2,18,19,65,2,8,1
+	longVector db 10
 	longElemento db 1
 	posActual db 0 
 	posACambiar db 0
@@ -72,6 +77,10 @@ main:
 	;; add rsp,8
 
 	;; ;; Si llego hasta aca tengo el handler del archivo en handle
+
+	sub rsp, 8
+	call imprimirVector
+	add rsp, 8
 	
 	sub rsp, 8
 	call pedirFuncionamiento
@@ -304,4 +313,40 @@ desplazamiento:			;Esta funcion me deja en el rax el desplazamiento que quiero. 
 	sub rbp, rbp		; Esta parte se encarga del (i-1) * longElemento
 	mov bpl, [longElemento]	;
 	imul rax, rbp		;
+ret
+
+imprimirVector:	
+	mov rdi, msjVerVectorInfo
+	sub rsp, 8
+	call puts
+	add rsp,8
+
+	
+	mov r12, 10
+loopImpresion:	
+	mov rcx, r12
+
+	mov r14, r12
+	sub r13, r13
+	mov r13b, byte[longVector]
+	sub r13, r14
+	
+
+	mov rbx, r13
+	sub rsp, 8
+	call desplazamiento
+	add rsp, 8
+
+
+	
+	mov rdi, msjVerVector
+	mov rsi, [vector + rax]
+	sub rsp, 8
+	call printf
+	add rsp, 8
+
+	dec r12
+	loop loopImpresion
+
+	
 ret
