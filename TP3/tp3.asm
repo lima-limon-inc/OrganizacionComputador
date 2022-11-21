@@ -239,25 +239,13 @@ iteracion:
 	call buscarElMinimo
 	add rsp, 8
 	
-
-
-	
 	loop iteracion
 	;; Aca deberia tener en r13 el valor minimo/maximo
-	
-	;; Aca hago el SWAP
-	sub rbx, rbx
-	mov bl, byte[corrida]
 
-	mov rax, r13
-	sub r13, r13
-	mov r13b, [vector + rbx]
+	sub rsp, 8
+	call hagoSwap
+	add rsp, 8
 	
-	mov r8b, [posACambiar] 
-	mov [vector + r8], r13b
-	
-	mov [vector + rbx], al
-
 	sub rsp, 8
 	call imprimirVector
 	add rsp, 8
@@ -387,4 +375,20 @@ loopImpresion:
 	loop loopImpresion
 
 	
+ret
+
+hagoSwap:
+	;; Aca hago el SWAP
+	sub rbx, rbx
+	mov bl, byte[corrida]
+
+	mov rax, r13
+	sub r13, r13
+	mov r13b, [vector + rbx]
+	
+	mov r8b, [posACambiar] 
+	mov [vector + r8], r13b
+	
+	mov [vector + rbx], al
+
 ret
