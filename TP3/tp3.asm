@@ -33,7 +33,7 @@ section 	.data ;Seccion con valores pre establecidos
 	msjRtaInvalida db "ERROR: Rta invalida, por favor responder 1 o 0", 0
 
 	msjVerVectorInfo db "Vector: ",0
-	msjVerVector db "%hhi", 0
+	msjVerVector db " %hhi ", 0
 	;; msjVerVector db "%hhi", 0
 
 	;; Procesamiento de archivos
@@ -82,17 +82,17 @@ main:
 	call imprimirVector
 	add rsp, 8
 	
-	sub rsp, 8
-	call pedirFuncionamiento
-	add rsp,8
-
 	;; sub rsp, 8
-	;; call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
+	;; call pedirFuncionamiento
 	;; add rsp,8
 
-	sub rsp, 8
-	call algoritmoDeOrdenamiento
-	add rsp, 8
+	;; ;; sub rsp, 8
+	;; ;; call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
+	;; ;; add rsp,8
+
+	;; sub rsp, 8
+	;; call algoritmoDeOrdenamiento
+	;; add rsp, 8
 
 ret
 
@@ -322,7 +322,7 @@ imprimirVector:
 	add rsp,8
 
 	
-	mov r12, 10
+	mov r12b, byte[longVector]
 loopImpresion:	
 	mov rcx, r12
 
@@ -346,6 +346,7 @@ loopImpresion:
 	add rsp, 8
 
 	dec r12
+	mov rcx, r12
 	loop loopImpresion
 
 	
