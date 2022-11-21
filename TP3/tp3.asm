@@ -44,11 +44,12 @@ section 	.data ;Seccion con valores pre establecidos
 	tamanoNumero db 1	;Cada numero tiene 1 byte de longitud
 
 	;; Vector
-	vector db 4,30,50,2,18,19,65,1,2,8,90,70
+	vector db 4,30,50,2,18,19,65,1,6,8,90,70, 34
 	longElemento db 1
 	posActual db 0 
 	posACambiar db 0
-	cantidadElementos db 12	;Este valor lo voy a determinar cuando lea el archivo. TODO
+	cantidadElementos db 13	;Este valor lo voy a determinar cuando lea el archivo. TODO
+	cantidadElementos2 db 13	;Este valor lo voy a determinar cuando lea el archivo. TODO
 
 	;; Variable de ir de sin signo a signo
 	;; bpfcs db "%o", 0
@@ -251,6 +252,12 @@ iteracion:
 	add rsp, 8
 	;; sub rbx, rbx
 	;; mov rbx, 0
+	mov al, byte[corrida]
+	mov byte[posActual], al
+	inc byte[posActual]
+	inc byte[corrida]
+	dec byte[cantidadElementos]
+	jmp algoritmoDeOrdenamiento
 
 
 
@@ -268,7 +275,6 @@ iteracion:
 ret
 
 buscarElMinimo:	
-	
 	sub rbx,  rbx
 	mov bl, byte[posActual]	;Dejo en rbx la posicion actual para la funcion desplazamiento
 	
@@ -346,14 +352,14 @@ imprimirVector:			;TODO: No imprime el ultimo elemento
 	add rsp,8
 
 	
-	mov r12b, byte[cantidadElementos]
+	mov r12b, byte[cantidadElementos2]
 	;; inc r12 		;Sumamos uno porque sino solo hace 9 corridas
 loopImpresion:	
 	mov rcx, r12
 
 	mov r14, r12
 	sub r13, r13
-	mov r13b, byte[cantidadElementos]
+	mov r13b, byte[cantidadElementos2]
 	sub r13, r14
 	
 
