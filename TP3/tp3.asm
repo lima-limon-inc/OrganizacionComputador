@@ -44,12 +44,12 @@ section 	.data ;Seccion con valores pre establecidos
 	tamanoNumero db 1	;Cada numero tiene 1 byte de longitud
 
 	;; Vector
-	vector db 4,30,50,2,18,19,65,1,6,8,90,70, 34
+	;; vector db 4,30,50,2,18,19,65,1,6,8,90,70
 	longElemento db 1
 	posActual db 0 
 	posACambiar db 0
-	cantidadElementos db 13	;Este valor lo voy a determinar cuando lea el archivo. TODO
-	cantidadElementos2 db 13	;Este valor lo voy a determinar cuando lea el archivo. TODO
+	;; cantidadElementos db 12	;Este valor lo voy a determinar cuando lea el archivo. TODO
+	cantidadElementos2 db 12	;Este valor lo voy a determinar cuando lea el archivo. TODO
 
 	;; Variable de ir de sin signo a signo
 	;; bpfcs db "%o", 0
@@ -66,42 +66,46 @@ section 	.bss ;Seccion sin valor por defecto
 
 	;; Variables de los archivos
 	archivoAOrdenar resw 1 	;Aca voy a guardar el nombre del archivo que el usuario quiere ordenar.
-	handle resb 1		;Aca voy a guardar el handler del archivo
+	handle resq 1		;Aca voy a guardar el handler del archivo
 
 	;; Variables de pasar del archivo al vector
 	numero resb 1
 	numeroStr resb 1
 	numeroInt resb 1
+
+	;; Variables del vector
+	vector resb 30
+	cantidadElementos resb 1
 	
 
 section 	.text
 main:
-	;; sub rsp, 8
-	;; call bienvenida		;En esta rutina voy a procesar el input que el usuario me diga (voy a verificar si el archivo existe). En esta rutina voy a darle la bienvenida al usuario
-	;; add rsp,8
+	sub rsp, 8
+	call bienvenida		;En esta rutina voy a procesar el input que el usuario me diga (voy a verificar si el archivo existe). En esta rutina voy a darle la bienvenida al usuario
+	add rsp,8
 
 	;; ;; Si llego hasta aca tengo el handler del archivo en handle
 
-	sub rsp, 8
-	call pedirFuncionamiento
-	add rsp,8
+	;; sub rsp, 8
+	;; call pedirFuncionamiento
+	;; add rsp,8
 
-	sub rsp, 8		;Muestro como se ve el vector antes de ordenarlo
-	mov rdi, msjAntesOrd
-	call puts
-	add rsp,8
+	;; sub rsp, 8		;Muestro como se ve el vector antes de ordenarlo
+	;; mov rdi, msjAntesOrd
+	;; call puts
+	;; add rsp,8
 
-	sub rsp, 8
-	call imprimirVector		
-	add rsp,8
-
-	;; ;; sub rsp, 8
-	;; ;; call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
-	;; ;; add rsp,8
+	;; sub rsp, 8
+	;; call imprimirVector		
+	;; add rsp,8
 
 	sub rsp, 8
-	call algoritmoDeOrdenamiento
-	add rsp, 8
+	call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
+	add rsp,8
+
+	;; sub rsp, 8
+	;; call algoritmoDeOrdenamiento
+	;; add rsp, 8
 
 ret
 
@@ -180,10 +184,12 @@ ret
 
 
 almacenarDatos:
-	sub rsi, rsi 		;Limpio el rsi para poder pasar correctamente el tamanoNumero
+	;; sub rdi, rdi
+	;; sub rsi, rsi 		;Limpio el rsi para poder pasar correctamente el tamanoNumero
+	;; mov rsi, byte[tamanoNumero] 
 	
 	mov rdi, numero
-	mov sil, byte[tamanoNumero]
+	mov rsi, 1
 	mov rdx, 1
 	mov rcx, [handle]
 	sub rsp, 8
@@ -192,35 +198,36 @@ almacenarDatos:
 	cmp rax, 0
 	jle EOF
 
-	mov r12b, byte[numero]	;DEBUG para ver que onda
+	mov r12b, byte[numero]	;DEBUG para ver que onda. TODO: BORRAR
 
 	;; HASTA ACA FUNCIONA
 	
-	;; sub rax, rax
-	;; cmp rax, 0
-	;; je almacenarDatos
+	jmp almacenarDatos
 	
-	mov rdi, numero
-	mov rsi, aStr
-	mov rdx, numeroStr
-	sub rsp, 8
-	call sscanf
-	add rsp, 8
+	;; mov rdi, numero
+	;; mov rsi, aStr
+	;; mov rdx, numeroStr
+	;; sub rsp, 8
+	;; call sscanf
+	;; add rsp, 8
 
-	mov r12b, byte[numeroStr];DEBUG para ver que onda
+	;; mov r12b, byte[numeroStr];DEBUG para ver que onda
 
-	mov rdi, numeroStr
-	mov rsi, bpfcs
-	mov rdx, numeroInt
-	sub rsp, 8
-	call sscanf
-	add rsp, 8
+	;; mov rdi, numeroStr
+	;; mov rsi, bpfcs
+	;; mov rdx, numeroInt
+	;; sub rsp, 8
+	;; call sscanf
+	;; add rsp, 8
 
-	mov r12b, byte[numeroInt];DEBUG para ver que onda
-ret
-
+	;; mov r12b, byte[numeroInt];DEBUG para ver que onda
 EOF:
+	mov rdi, [handle]
+	sub rsp, 8		;Cierro el archivo antes de salir de la rutina
+	call fclose
+	add rsp, 8
 ret
+
 
 
 
