@@ -103,6 +103,11 @@ main:
 	call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
 	add rsp,8
 
+	
+	sub rsp, 8
+	call imprimirVector		
+	add rsp,8
+
 	;; sub rsp, 8
 	;; call algoritmoDeOrdenamiento
 	;; add rsp, 8
@@ -198,35 +203,33 @@ almacenarDatos:
 	cmp rax, 0
 	jle EOF
 
-	mov r12b, byte[numero]	;DEBUG para ver que onda. TODO: BORRAR
+	sub r12, r12 		;Limpio basura
+	mov r12b, byte[numero]	;Guardo en el registro 12 el numero que acabo de leer
+
 	inc byte[cantidadElementos] ;A medida que voy encontrando elementos, aumento la variable "cantidadElementos" para saber a futuro cuantos elementos tiene mi vector
 
 	;; HASTA ACA FUNCIONA
+
+	sub rbx, rbx
+	mov bl, [posActual]
+	
+	sub rsp, 8
+	call desplazamiento
+	add rsp, 8
+
+	inc byte[posActual]	;Quiero que el proximo elemento se almacene en la proxima posicion
+
+	mov [vector + rax], r12b
 	
 	jmp almacenarDatos
 	
-	;; mov rdi, numero
-	;; mov rsi, aStr
-	;; mov rdx, numeroStr
-	;; sub rsp, 8
-	;; call sscanf
-	;; add rsp, 8
-
-	;; mov r12b, byte[numeroStr];DEBUG para ver que onda
-
-	;; mov rdi, numeroStr
-	;; mov rsi, bpfcs
-	;; mov rdx, numeroInt
-	;; sub rsp, 8
-	;; call sscanf
-	;; add rsp, 8
-
-	;; mov r12b, byte[numeroInt];DEBUG para ver que onda
 EOF:
 	mov rdi, [handle]
 	sub rsp, 8		;Cierro el archivo antes de salir de la rutina
 	call fclose
 	add rsp, 8
+
+	mov byte[posActual], 0	;Actualizo el valor de posActual para poder usarlo despues
 ret
 
 
@@ -323,7 +326,7 @@ actualizarNuevo:
 FinComparacion:	
 ret
 
-	;; Funcion que calcula el desplazamieno
+	;; Funcion que calcula el desplazamiento
 desplazamiento:			;Esta funcion me deja en el rax el desplazamiento que quiero y en el rbx actualiza la localizacion. Recibe en el registro rbx la posicion actual
 	;; Calcular desplazamiento en un vector (i - 1) * longElemento
 
