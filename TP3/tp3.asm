@@ -308,14 +308,17 @@ FuncionDeComparacion: 		;Compara los registros r12 y r13 y devuelve el correspon
 
 	jmp ComparacionDescendente ;TODO: Hacer Descendente
 ComparacionAscendete:	
-	cmp r13, r12
+	cmp r13b, r12b
 	jg actualizarNuevo
 
 	;; Si llego hasta aca, signfica que no quiero actualizar nada
 	jmp FinComparacion
 ComparacionDescendente:
+	cmp r13b, r12b
+	jl actualizarNuevo
 
-
+	;; Si llego hasta aca, signfica que no quiero actualizar nada
+	jmp FinComparacion
 actualizarNuevo:
 	mov r13, r12
 	mov r8b, byte[posActual]
@@ -365,8 +368,9 @@ loopImpresion:
 	add rsp, 8
 
 	
+	sub rsi, rsi
 	mov rdi, msjVerVector
-	mov rsi, [vector + rax]
+	mov sil, byte[vector + rax]
 	sub rsp, 8
 	call printf
 	add rsp, 8
