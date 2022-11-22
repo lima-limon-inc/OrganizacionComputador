@@ -48,8 +48,6 @@ section 	.data ;Seccion con valores pre establecidos
 	longElemento db 1
 	posActual db 0 
 	posACambiar db 0
-	;; cantidadElementos db 12	;Este valor lo voy a determinar cuando lea el archivo. TODO
-	cantidadElementos2 db 12	;Este valor lo voy a determinar cuando lea el archivo. TODO
 
 	;; Variable de ir de sin signo a signo
 	;; bpfcs db "%o", 0
@@ -76,6 +74,7 @@ section 	.bss ;Seccion sin valor por defecto
 	;; Variables del vector
 	vector resb 30
 	cantidadElementos resb 1
+	cantidadElementosTotales resb 1
 	
 
 section 	.text
@@ -206,6 +205,7 @@ almacenarDatos: 		;TODO: Chequear que anden negativos
 	mov r12b, byte[numero]	;Guardo en el registro 12 el numero que acabo de leer
 
 	inc byte[cantidadElementos] ;A medida que voy encontrando elementos, aumento la variable "cantidadElementos" para saber a futuro cuantos elementos tiene mi vector
+	inc byte[cantidadElementosTotales] ;A medida que voy encontrando elementos, aumento la variable "cantidadElementos" para saber a futuro cuantos elementos tiene mi vector. Esta variable remane constante a lo largo del programa
 
 	;; HASTA ACA FUNCIONA
 
@@ -348,14 +348,14 @@ imprimirVector:			;TODO: No imprime el ultimo elemento
 	add rsp,8
 
 	
-	mov r12b, byte[cantidadElementos2]
+	mov r12b, byte[cantidadElementosTotales]
 	;; inc r12 		;Sumamos uno porque sino solo hace 9 corridas
 loopImpresion:	
 	mov rcx, r12
 
 	mov r14, r12
 	sub r13, r13
-	mov r13b, byte[cantidadElementos2]
+	mov r13b, byte[cantidadElementosTotales]
 	sub r13, r14
 	
 
