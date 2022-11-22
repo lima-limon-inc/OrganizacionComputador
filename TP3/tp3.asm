@@ -86,7 +86,6 @@ main:
 	call pedirFuncionamiento
 	add rsp,8
 
-	
 	sub rsp, 8		;Muestro como se ve el vector antes de ordenarlo
 	mov rdi, msjAntesOrd
 	call puts
@@ -259,19 +258,6 @@ iteracion:
 	dec byte[cantidadElementos]
 	jmp algoritmoDeOrdenamiento
 
-
-
-
-	
-	;; sub rax, rax
-	;; mov al, byte[cantidadElementos]
-	
-	;; dec byte[cantidadElementos] ;Si llego aca ya encontre el swapeo
-	;; sub rbx, rbx
-	;; mov bl, byte[cantidadElementos]
-
-	
-	;; call gets
 ret
 
 buscarElMinimo:	
