@@ -199,6 +199,7 @@ almacenarDatos:
 	jle EOF
 
 	mov r12b, byte[numero]	;DEBUG para ver que onda. TODO: BORRAR
+	inc byte[cantidadElementos] ;A medida que voy encontrando elementos, aumento la variable "cantidadElementos" para saber a futuro cuantos elementos tiene mi vector
 
 	;; HASTA ACA FUNCIONA
 	
