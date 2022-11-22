@@ -35,7 +35,7 @@ section 	.data ;Seccion con valores pre establecidos
 	msjVerVectorInfo db "Vector: ",0
 	msjVerVector db " %hhi ", 0
 	msjAntesOrd db "Vector antes de ser ordenado: ",0
-	;; msjVerVector db "%hhi", 0
+	msjEspacio db "", 0
 
 	;; Procesamiento de archivos
 	mode db "rb", 0
@@ -84,33 +84,32 @@ main:
 	call bienvenida		;En esta rutina voy a procesar el input que el usuario me diga (voy a verificar si el archivo existe). En esta rutina voy a darle la bienvenida al usuario
 	add rsp,8
 
-	;; ;; Si llego hasta aca tengo el handler del archivo en handle
-
-	;; sub rsp, 8
-	;; call pedirFuncionamiento
-	;; add rsp,8
-
-	;; sub rsp, 8		;Muestro como se ve el vector antes de ordenarlo
-	;; mov rdi, msjAntesOrd
-	;; call puts
-	;; add rsp,8
-
-	;; sub rsp, 8
-	;; call imprimirVector		
-	;; add rsp,8
-
 	sub rsp, 8
 	call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
 	add rsp,8
 
-	
+	sub rsp, 8 		;Si llego hasta significantly1
+	call pedirFuncionamiento
+	add rsp,8
+
+	sub rsp, 8		;Muestro como se ve el vector antes de ordenarlo
+	mov rdi, msjAntesOrd
+	call puts
+	add rsp,8
+
 	sub rsp, 8
 	call imprimirVector		
 	add rsp,8
 
+	sub rsp, 8
+	call algoritmoDeOrdenamiento
+	add rsp, 8
+
+	
 	;; sub rsp, 8
-	;; call algoritmoDeOrdenamiento
-	;; add rsp, 8
+	;; call imprimirVector		
+	;; add rsp,8
+
 
 ret
 
@@ -295,13 +294,13 @@ ret
 	;; Funcion que calcula si tengo que 
 primeraCorrida:	
 	mov r13, r12
-	sub r15, r15
+	sub r15, r15 		;Cuando ya hice la primera corrida quiero eliminar ese valor intermedio del registro r15
 	
-FuncionDeComparacion: 		;Compara los registros rax y rbx y devuelve el correspondiente (segun el funcionamiento del programa) en el r13. TODO: QUE SOLO USE LA PARTE DE LOS 8 BITS
+FuncionDeComparacion: 		;Compara los registros r12 y r13 y devuelve el correspondiente (segun el funcionamiento del programa) en el r13. TODO: QUE SOLO USE LA PARTE DE LOS 8 BITS
 	cmp r15, "Pp"
 	je primeraCorrida
 
-	mov r15, [ordenarMayor]
+	mov r15b, byte[ordenarMayor]
 	cmp r15, 1 		;Si esto es 1, quiero ascendente
 	je ComparacionAscendete
 
@@ -364,7 +363,6 @@ loopImpresion:
 	sub rsp, 8
 	call desplazamiento
 	add rsp, 8
-
 
 	
 	mov rdi, msjVerVector
