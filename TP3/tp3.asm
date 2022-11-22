@@ -266,7 +266,12 @@ iteracion:
 	inc byte[posActual]
 	inc byte[corrida]
 	dec byte[cantidadElementos]
-	jmp algoritmoDeOrdenamiento
+
+
+	sub r9, r9
+	mov r9b, byte[corrida]
+	cmp r9b, byte[cantidadElementosTotales]
+	jne algoritmoDeOrdenamiento
 
 ret
 
