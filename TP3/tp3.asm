@@ -377,6 +377,10 @@ loopImpresion:
 	mov rcx, r12
 	loop loopImpresion
 
+	mov rdi, msjEspacio
+	sub rsp, 8
+	call puts
+	add rsp, 8
 	
 ret
 
