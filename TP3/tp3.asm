@@ -358,9 +358,10 @@ imprimirVector:			;TODO: No imprime el ultimo elemento
 	
 	mov r12b, byte[cantidadElementosTotales]
 	;; inc r12 		;Sumamos uno porque sino solo hace 9 corridas
-loopImpresion:	
 	mov rcx, r12
-
+loopImpresion:	
+	mov r12, rcx
+	
 	mov r14, r12
 	sub r13, r13
 	mov r13b, byte[cantidadElementosTotales]
@@ -380,7 +381,7 @@ loopImpresion:
 	call printf
 	add rsp, 8
 
-	dec r12
+	;; dec r12
 	mov rcx, r12
 	loop loopImpresion
 
