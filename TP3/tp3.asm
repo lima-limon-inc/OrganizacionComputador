@@ -188,7 +188,7 @@ ret
 	
 
 
-almacenarDatos:
+almacenarDatos: 		;TODO: Chequear que anden negativos
 	;; sub rdi, rdi
 	;; sub rsi, rsi 		;Limpio el rsi para poder pasar correctamente el tamanoNumero
 	;; mov rsi, byte[tamanoNumero] 
