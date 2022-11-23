@@ -326,6 +326,7 @@ ComparacionDescendente:
 	jmp FinComparacion
 actualizarNuevo:
 	mov r13, r12
+	sub r8, r8
 	mov r8b, byte[posActual]
 	mov byte[posACambiar], r8b
 	dec byte[posACambiar]	;Correcion TODO: Chequear
