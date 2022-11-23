@@ -59,7 +59,7 @@ section 	.data ;Seccion con valores pre establecidos
 	aStr db "%s", 0
 
 	;; Variables del ordenamiento
-	corrida db 1
+	corrida db 0
 
 section 	.bss ;Seccion sin valor por defecto
 
@@ -243,12 +243,13 @@ algoritmoDeOrdenamiento:
 	mov cl, byte[cantidadElementos] ;TODO: Sumar pos actual restar cantidad de Elementos
 
 iteracion:	
-	;; inc byte[posActual]	
 
 	sub rsp, 8
 	call buscarElMinimo
 	add rsp, 8
 	
+	inc byte[posActual]	
+
 	loop iteracion
 	;; Aca deberia tener en r13 el valor minimo/maximo
 
