@@ -59,7 +59,7 @@ section 	.data ;Seccion con valores pre establecidos
 	aStr db "%s", 0
 
 	;; Variables del ordenamiento
-	corrida db 0
+	corrida db 1
 
 section 	.bss ;Seccion sin valor por defecto
 
@@ -243,6 +243,7 @@ algoritmoDeOrdenamiento:
 	mov cl, byte[cantidadElementos] ;TODO: Sumar pos actual restar cantidad de Elementos
 
 iteracion:	
+	;; inc byte[posActual]	
 
 	sub rsp, 8
 	call buscarElMinimo
@@ -286,10 +287,10 @@ buscarElMinimo:
 	call desplazamiento 	;Me devuelve en el rax el desplazamiento requerido
 	add rsp, 8
 
-	mov byte[posActual], bl ;Actualizo la posicion actual que me devuelve desplazamiento 
+	;; inc byte[posActual]     ;Actualizo la posicion actual que me devuelve desplazamiento 
 	
 	sub r12, r12		;Esto me deja el item del vector en r12
-	mov r12b, [vector + rax];
+	mov r12b, byte[vector + rax];
 
 	;; Si llego aca, tengo en el r12 el valor actual
 	sub rsp, 8
@@ -332,7 +333,7 @@ actualizarNuevo:
 	sub r8, r8
 	mov r8b, byte[posActual]
 	mov byte[posACambiar], r8b
-	dec byte[posACambiar]	;Correcion TODO: Chequear
+	;; dec byte[posACambiar]	;Correcion TODO: Chequear
 	
 FinComparacion:	
 ret
@@ -340,14 +341,14 @@ ret
 	;; Funcion que calcula el desplazamiento
 desplazamiento:			;Esta funcion me deja en el rax el desplazamiento que quiero y en el rbx actualiza la localizacion. Recibe en el registro rbx la posicion actual
 	;; Calcular desplazamiento en un vector (i - 1) * longElemento
+	;; i empieza en 1
 
-	sub rax, rax		; Esta parte se encarga del i - 1
-	inc rbx
-	mov rax, rbx
-	dec rax			;
+	sub rax, rax		
+	mov rax, rbx 		; Esta parte se encarga del i - 1 
+	dec rax			
 
-	sub rbp, rbp		; Esta parte se encarga del (i-1) * longElemento
-	mov bpl, [longElemento]	;
+	sub rbp, rbp		;
+	mov bpl, byte[longElemento]	; Esta parte se encarga del (i-1) * longElemento
 	imul rax, rbp		;
 ret
 
@@ -398,19 +399,39 @@ ret
 
 hagoSwap:
 	;; Aca hago el SWAP
+	sub r13, r13
 	sub rbx, rbx
 	mov bl, byte[corrida]
+	sub rsp, 8
+	call desplazamiento
+	add rsp, 8
+	mov r13b, byte[vector + rax]	;En r13 me guardo la corrida, que es el que tengo que cambiar
+	mov r8, rax 		;Me guardo el desplazamiento en el r8
+	
+	sub r12, r12
+	sub rbx, rbx
+	mov bl, byte[posACambiar]
+	sub rsp, 8
+	call desplazamiento
+	add rsp, 8
+	mov r12b, byte[vector + rax]	;En r12 me guardo el de la posicion a Cambiar
 
-	sub rax,rax
-	mov rax, r13
+	mov byte[vector + rax], r13b
 	
-	sub r13, r13
-	mov r13b, [vector + rbx]
+	mov byte[vector + r8], r12b
+
 	
-	mov r8b, [posACambiar] 
-	mov [vector + r8], r13b
 	
-	mov [vector + rbx], al
+	;; sub rax,rax
+	;; mov rax, r13
+	
+	;; sub r13, r13
+	;; mov r13b, [vector + rbx]
+	
+	;; mov r8b, [posACambiar] 
+	;; mov [vector + r8], r13b
+	
+	;; mov [vector + rbx], al
 
 ret
 
