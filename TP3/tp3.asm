@@ -35,7 +35,11 @@ section 	.data ;Seccion con valores pre establecidos
 	msjVerVectorInfo db "Vector: ",0
 	msjVerVector db " %hhi ", 0
 	msjAntesOrd db "Vector antes de ser ordenado: ",0
-	msjEspacio db "", 0
+	msjEspacioOFlecha db " %c ", 0
+	msjEspacio db " ", 0
+	msjFlecha db " Test ", 0
+
+	
 
 	;; Procesamiento de archivos
 	mode db "rb", 0
@@ -187,10 +191,6 @@ ret
 
 
 almacenarDatos: 		;TODO: Chequear que anden negativos
-	;; sub rdi, rdi
-	;; sub rsi, rsi 		;Limpio el rsi para poder pasar correctamente el tamanoNumero
-	;; mov rsi, byte[tamanoNumero] 
-	
 	mov rdi, numero
 	mov rsi, 1
 	mov rdx, 1
@@ -236,12 +236,11 @@ ret
 
 	
 algoritmoDeOrdenamiento:
-
 	sub r13, r13 		;Limpio el registro 13 para mas adelante. TODO: Mejor solucion?
 	mov r15, "Pp"		;Pp --> Primer corrida, en la primera corrida tengo que guardar el primer elemento del vector
 	
 	sub rcx, rcx
-	mov cl, byte[cantidadElementos] ;TODOTODO: Sumar pos actual restar cantidad de Elementos
+	mov cl, byte[cantidadElementos] ;TODO: Sumar pos actual restar cantidad de Elementos
 
 iteracion:	
 
@@ -255,12 +254,16 @@ iteracion:
 	sub rsp, 8
 	call hagoSwap
 	add rsp, 8
-	
+
+
 	sub rsp, 8
 	call imprimirVector
 	add rsp, 8
-	;; sub rbx, rbx
-	;; mov rbx, 0
+
+	;; sub rsp, 8
+	;; call mostrarFlechas
+	;; add rsp, 8
+
 	mov al, byte[corrida]
 	mov byte[posActual], al
 	inc byte[posActual]
@@ -350,7 +353,7 @@ ret
 
 
 	;; Rutina que se encarga de imprimir el vector
-imprimirVector:			;TODO: No imprime el ultimo elemento
+imprimirVector:
 	mov rdi, msjVerVectorInfo
 	sub rsp, 8
 	call puts
@@ -398,7 +401,9 @@ hagoSwap:
 	sub rbx, rbx
 	mov bl, byte[corrida]
 
+	sub rax,rax
 	mov rax, r13
+	
 	sub r13, r13
 	mov r13b, [vector + rbx]
 	
@@ -408,3 +413,43 @@ hagoSwap:
 	mov [vector + rbx], al
 
 ret
+
+
+;; mostrarFlechas:
+;; 	sub r12, r12
+;; 	mov r12b, byte[cantidadElementosTotales]
+
+;; 	mov rcx, r12
+;; loopFlechas:
+;; 	mov r12, rcx
+
+;; 	cmp cl, byte[posActual]
+;; 	je imprimirFlecha
+
+;; 	cmp cl, byte[posACambiar]
+;; 	je imprimirFlecha
+
+;; 	mov rdi, msjEspacioOFlecha
+;; 	mov rsi, msjEspacio
+;; 	sub rsp, 8
+;; 	call printf
+;; 	add rsp, 8
+
+
+;; postComparacion:	
+
+;; 	mov rcx, r12
+;; 	loop loopFlechas
+
+
+;; ret
+
+;; imprimirFlecha:
+
+;; 	mov rdi, msjEspacioOFlecha
+;; 	mov rsi, msjFlecha
+;; 	sub rsp, 8
+;; 	call puts
+;; 	add rsp, 8
+
+;; 	jmp postComparacion
