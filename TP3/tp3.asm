@@ -17,7 +17,6 @@ extern gets
 extern printf
 extern sscanf
 extern fopen
-extern fwrite
 extern fread
 extern fclose
 
@@ -39,27 +38,25 @@ section 	.data ;Seccion con valores pre establecidos
 	msjEspacio db " ", 0
 	msjFlecha db " Test ", 0
 
-	
-
 	;; Procesamiento de archivos
 	mode db "rb", 0
 
 	;; Variables de pasar del archivo al vector
 	tamanoNumero db 1	;Cada numero tiene 1 byte de longitud
 
-	;; Vector
-	;; vector db 4,30,50,2,18,19,65,1,6,8,90,70
-	longElemento db 1
-	posActual db 0 
-	posACambiar db 0
+	;; Variables relacionadas con el vector
+	;; El vector deberia verse asi: 4,30,-50,2,18,-19,65,1,6,8,90,70
+
+	longElemento db 1       ;Constante que representa la longitud del elemento
+	posActual db 0 		;Posicion en donde se encuentra en el vecot
+	posACambiar db 0 	;Posicion con la que tenemos que swapear
 
 	;; Variable de ir de sin signo a signo
-	;; bpfcs db "%o", 0
-	bpfcs db "%hhi", 0
+	bpfcs db "%hhi", 0 	;Formato para int de 8 bits
 	aStr db "%s", 0
 
 	;; Variables del ordenamiento
-	corrida db 0
+	corrida db 0 		;Por que "iteracion" del ordenamiento voy
 
 section 	.bss ;Seccion sin valor por defecto
 
@@ -77,7 +74,7 @@ section 	.bss ;Seccion sin valor por defecto
 
 	;; Variables del vector
 	vector times 30 resb 1
-	cantidadElementos resb 1
+	cantidadElementosRestantes resb 1
 	cantidadElementosTotales resb 1
 	
 
@@ -204,8 +201,8 @@ almacenarDatos: 		;TODO: Chequear que anden negativos
 	sub r12, r12 		;Limpio basura
 	mov r12b, byte[numero]	;Guardo en el registro 12 el numero que acabo de leer
 
-	inc byte[cantidadElementos] ;A medida que voy encontrando elementos, aumento la variable "cantidadElementos" para saber a futuro cuantos elementos tiene mi vector
-	inc byte[cantidadElementosTotales] ;A medida que voy encontrando elementos, aumento la variable "cantidadElementos" para saber a futuro cuantos elementos tiene mi vector. Esta variable remane constante a lo largo del programa
+	inc byte[cantidadElementosRestantes] ;A medida que voy encontrando elementos, aumento la variable "cantidadElementosRestantes" para saber a futuro cuantos elementos tiene mi vector
+	inc byte[cantidadElementosTotales] ;A medida que voy encontrando elementos, aumento la variable "cantidadElementosRestantes" para saber a futuro cuantos elementos tiene mi vector. Esta variable remane constante a lo largo del programa
 
 	;; HASTA ACA FUNCIONA
 
@@ -240,7 +237,7 @@ algoritmoDeOrdenamiento:
 	mov r15, "Pp"		;Pp --> Primer corrida, en la primera corrida tengo que guardar el primer elemento del vector
 	
 	sub rcx, rcx
-	mov cl, byte[cantidadElementos] ;TODO: Sumar pos actual restar cantidad de Elementos
+	mov cl, byte[cantidadElementosRestantes] ;TODO: Sumar pos actual restar cantidad de Elementos
 
 iteracion:	
 
@@ -270,7 +267,7 @@ iteracion:
 	mov byte[posActual], al
 	inc byte[posActual]
 	inc byte[corrida]
-	dec byte[cantidadElementos]
+	dec byte[cantidadElementosRestantes]
 
 
 	sub r9, r9
