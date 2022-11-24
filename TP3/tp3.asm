@@ -74,14 +74,14 @@ section 	.bss ;Seccion sin valor por defecto
 
 	;; Variables del vector
 	vector times 30 resb 1
-	cantidadElementosRestantes resb 1
-	cantidadElementosTotales resb 1
+	cantidadElementosRestantes resb 1 ;Variable que representa la cantidad de elementos que me quedan ver en el vector
+	cantidadElementosTotales resb 1	  ;Constante que representa la cantidad de elementos totales del vector
 	
 
 section 	.text
 main:
 	sub rsp, 8
-	call bienvenida		;En esta rutina voy a procesar el input que el usuario me diga (voy a verificar si el archivo existe). En esta rutina voy a darle la bienvenida al usuario
+	call bienvenida		;En esta rutina voy a procesar el input que el usuario me diga (voy a verificar si el archivo existe).
 	add rsp,8
 
 	sub rsp, 8
@@ -119,24 +119,23 @@ ret
 errorArchivo:
 	mov rdi, msjErrorNoExisteArchivo
 	sub rsp, 8
-	call puts
+	call puts		;Mensaje que le informa al usuario que no existe el archivo que paso
 	add rsp, 8
 bienvenida:
-	mov rdi, msjPedirArchivo
+	mov rdi, msjPedirArchivo 
 	sub rsp, 8
-	call puts
+	call puts		;Le pido al usuario que me pase un archivo
 	add rsp, 8
 
-
-	mov rdi, archivoAOrdenar ;El usuario ingresa el archivo que quiere ordenar
+	mov rdi, archivoAOrdenar 
 	sub rsp, 8
-	call gets
+	call gets		;El usuario ingresa el archivo que quiere ordenar y lo  guardo en archivoAOrdenar
 	add rsp, 8
 	
 	mov rdi, archivoAOrdenar
 	mov rsi, mode
 	sub rsp, 8
-	call fopen
+	call fopen 		;Abro el archivo que el usuario me paso
 	add rsp, 8
 
 	cmp rax, 0 		;Corroboro que el archivo exista
