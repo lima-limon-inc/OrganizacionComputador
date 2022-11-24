@@ -249,14 +249,10 @@ iteracion:
 	call imprimirVector 	;Muestro como quedo el vector despues del swapeo
 	add rsp, 8
 
-	;; sub rsp, 8
-	;; call mostrarFlechas
-	;; add rsp, 8
-
+	inc byte[corrida] 	;A este punto, tengo que ir a la proxima corrida del programa
 	mov al, byte[corrida]
-	mov byte[posActual], al
-	inc byte[posActual]
-	inc byte[corrida]
+	mov byte[posActual], al ;Reinicio posActual al resto del vector
+
 	dec byte[cantidadElementosRestantes]
 
 
