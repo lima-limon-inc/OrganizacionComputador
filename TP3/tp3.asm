@@ -253,13 +253,13 @@ iteracion:
 	mov al, byte[corrida]
 	mov byte[posActual], al ;Reinicio posActual al resto del vector
 
-	dec byte[cantidadElementosRestantes]
+	dec byte[cantidadElementosRestantes] ;Ahora hay un elemento menos que chequear
 
 
 	sub r9, r9
 	mov r9b, byte[corrida]
 	cmp r9b, byte[cantidadElementosTotales]
-	jne algoritmoDeOrdenamiento
+	jne algoritmoDeOrdenamiento ;Sigo compranado hasta que haya recorrido todo el vector
 
 ret
 
@@ -402,43 +402,3 @@ hagoSwap:
 	mov byte[vector + r8], r12b
 
 ret
-
-
-;; mostrarFlechas:
-;; 	sub r12, r12
-;; 	mov r12b, byte[cantidadElementosTotales]
-
-;; 	mov rcx, r12
-;; loopFlechas:
-;; 	mov r12, rcx
-
-;; 	cmp cl, byte[posActual]
-;; 	je imprimirFlecha
-
-;; 	cmp cl, byte[posACambiar]
-;; 	je imprimirFlecha
-
-;; 	mov rdi, msjEspacioOFlecha
-;; 	mov rsi, msjEspacio
-;; 	sub rsp, 8
-;; 	call printf
-;; 	add rsp, 8
-
-
-;; postComparacion:	
-
-;; 	mov rcx, r12
-;; 	loop loopFlechas
-
-
-;; ret
-
-;; imprimirFlecha:
-
-;; 	mov rdi, msjEspacioOFlecha
-;; 	mov rsi, msjFlecha
-;; 	sub rsp, 8
-;; 	call puts
-;; 	add rsp, 8
-
-;; 	jmp postComparacion
