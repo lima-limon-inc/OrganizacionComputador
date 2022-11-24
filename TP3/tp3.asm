@@ -31,7 +31,7 @@ section 	.data ;Seccion con valores pre establecidos
 	msjMayorOMenor db "Como queres que ordene tu archivo? De manera ascendenteo (1) descendente (0)?", 0
 	msjRtaInvalida db "ERROR: Rta invalida, por favor responder 1 o 0", 0
 
-	msjVerVectorInfo db "Vector: ",0
+	msjVerVectorInfo db `                 Iteracion: %hhi \n`,0
 	msjVerVector db " %hhi ", 0
 	msjAntesOrd db "Vector antes de ser ordenado: ",0
 	msjEspacioOFlecha db " %c ", 0
@@ -56,7 +56,7 @@ section 	.data ;Seccion con valores pre establecidos
 	aStr db "%s", 0
 
 	;; Variables del ordenamiento
-	corrida db 0 		;Por que "iteracion" del ordenamiento voy
+	corrida db -1 		;Por que "iteracion" del ordenamiento voy
 
 section 	.bss ;Seccion sin valor por defecto
 
@@ -100,6 +100,8 @@ main:
 	sub rsp, 8
 	call imprimirVector	;Muestro como se ve el vector antes de ordenarlo
 	add rsp,8
+
+	inc byte[corrida] 	;Incremento el valor de la variable porque al principio se la mostre al usuario como corrida 0. Ahora la necesito usar, asique le asigno el valor de 0
 
 	sub rsp, 8
 	call algoritmoDeOrdenamiento
@@ -336,10 +338,14 @@ ret
 
 	;; Rutina que se encarga de imprimir el vector
 imprimirVector:
+	mov r9, [corrida]
+	inc r9
+
 	mov rdi, msjVerVectorInfo
+	mov rsi, r9
 	sub rsp, 8
-	call puts
-	add rsp,8
+	call printf
+	add rsp, 8
 
 	
 	mov r12b, byte[cantidadElementosTotales]
