@@ -88,7 +88,7 @@ main:
 	call almacenarDatos	;En esta rutina voy a almacenar todos los datos que tengo guardados en handler
 	add rsp,8
 
-	sub rsp, 8 		;Si llego hasta significantly1
+	sub rsp, 8 		;En esta rutina le pido al usuario que me diga como quiere que ordene el vector
 	call pedirFuncionamiento
 	add rsp,8
 
@@ -98,24 +98,18 @@ main:
 	add rsp,8
 
 	sub rsp, 8
-	call imprimirVector		
+	call imprimirVector	;Muestro como se ve el vector antes de ordenarlo
 	add rsp,8
 
 	sub rsp, 8
 	call algoritmoDeOrdenamiento
 	add rsp, 8
 
-	
-	;; sub rsp, 8
-	;; call imprimirVector		
-	;; add rsp,8
-
-
 ret
 
 ;; Rutinas del main	
 
-	;; Rutina de bienvenida
+;; Rutina de bienvenida, se encarga de saludar al usuario, le pide un archivo y corrobora que exista
 errorArchivo:
 	mov rdi, msjErrorNoExisteArchivo
 	sub rsp, 8
@@ -186,8 +180,8 @@ ret
 	
 
 
-almacenarDatos: 		;TODO: Chequear que anden negativos
-	mov rdi, numero
+almacenarDatos:
+	mov rdi, numero		;Me guardo el numero del archivo en la variable "numero"
 	mov rsi, 1
 	mov rdx, 1
 	mov rcx, [handle]
@@ -203,18 +197,16 @@ almacenarDatos: 		;TODO: Chequear que anden negativos
 	inc byte[cantidadElementosRestantes] ;A medida que voy encontrando elementos, aumento la variable "cantidadElementosRestantes" para saber a futuro cuantos elementos tiene mi vector
 	inc byte[cantidadElementosTotales] ;A medida que voy encontrando elementos, aumento la variable "cantidadElementosRestantes" para saber a futuro cuantos elementos tiene mi vector. Esta variable remane constante a lo largo del programa
 
-	;; HASTA ACA FUNCIONA
-
 	sub rbx, rbx
-	mov bl, [posActual]
+	mov bl, [posActual] 	;Guardo la posicion actual en ese registro porque la funcion desplazamiento recibe como argumento la posicion actual y devuelve el desplazamiento para le vector
 	
 	sub rsp, 8
-	call desplazamiento
+	call desplazamiento	;Me devuelve en el rax el desplazamiento requerido
 	add rsp, 8
 
 	inc byte[posActual]	;Quiero que el proximo elemento se almacene en la proxima posicion
 
-	mov [vector + eax], r12b
+	mov [vector + eax], r12b ;Guardo en el vector (teniendo en cuenta el desplazamiento devuelto por desplazamiento) el valor que tengo en el registro r12
 	
 	jmp almacenarDatos
 	
@@ -232,30 +224,29 @@ ret
 
 	
 algoritmoDeOrdenamiento:
-	sub r13, r13 		;Limpio el registro 13 para mas adelante. TODO: Mejor solucion?
-	mov r15, "Pp"		;Pp --> Primer corrida, en la primera corrida tengo que guardar el primer elemento del vector
+	sub r13, r13 		;Limpio el registro 13 para mas adelante.
+	mov r15, "Pp"		;Pp --> Primer corrida, en la primera corrida tengo que guardar el primer elemento del vector, de ahi que tiene un comportamiento diferente
 	
 	sub rcx, rcx
-	mov cl, byte[cantidadElementosRestantes] ;TODO: Sumar pos actual restar cantidad de Elementos
+	mov cl, byte[cantidadElementosRestantes] ;Me guardo en rcx (el registro asociado al loop) la cantidad de iteracion restantes
 
 iteracion:	
 
 	sub rsp, 8
-	call buscarElMinimo
+	call buscarElMinimo 	;Esta funcion se encarga de buscar el minimo desde donde estoy parado hasta el final
 	add rsp, 8
 	
-	inc byte[posActual]	
+	inc byte[posActual]	;Actualizo la posicion actual
 
-	loop iteracion
-	;; Aca deberia tener en r13 el valor minimo/maximo
-
+	loop iteracion 		;Voy a loopear hasta no tener mas elementos restantes
+	;; En esta parte del programa deberia tener en r13 el valor minimo/maximo
 	sub rsp, 8
-	call hagoSwap
+	call hagoSwap 		;Esta funcion se encarga de hacer el intercambio entre la posicion actual y el minimo/maximo
 	add rsp, 8
 
 
 	sub rsp, 8
-	call imprimirVector
+	call imprimirVector 	;Muestro como quedo el vector despues del swapeo
 	add rsp, 8
 
 	;; sub rsp, 8
@@ -278,20 +269,18 @@ ret
 
 buscarElMinimo:	
 	sub rbx,  rbx
-	mov bl, byte[posActual]	;Dejo en rbx la posicion actual para la funcion desplazamiento
+	mov bl, byte[posActual]	;Guardo la posicion actual en ese registro porque la funcion desplazamiento recibe como argumento la posicion actual y devuelve el desplazamiento para le vector
 	
 	sub rsp, 8
 	call desplazamiento 	;Me devuelve en el rax el desplazamiento requerido
 	add rsp, 8
-
-	;; inc byte[posActual]     ;Actualizo la posicion actual que me devuelve desplazamiento 
 	
 	sub r12, r12		;Esto me deja el item del vector en r12
 	mov r12b, byte[vector + eax];
 
 	;; Si llego aca, tengo en el r12 el valor actual
 	sub rsp, 8
-	call FuncionDeComparacion
+	call FuncionDeComparacion ;Esta es la funcion que se encarga de comparar el valor actual y el ultimo guardado
 	add rsp, 8
 
 ret
@@ -299,11 +288,11 @@ ret
 	;; FUNCIONES AUXILIARES
 	;; Funcion que calcula si tengo que 
 primeraCorrida:	
-	mov r13, r12
+	mov r13, r12		;En la primera corrida, tengo que hacer que el ultimo mas grande/chico sea el actual 
 	sub r15, r15 		;Cuando ya hice la primera corrida quiero eliminar ese valor intermedio del registro r15
 	
-FuncionDeComparacion: 		;Compara los registros r12 y r13 y devuelve el correspondiente (segun el funcionamiento del programa) en el r13. TODO: QUE SOLO USE LA PARTE DE LOS 8 BITS
-	cmp r15, "Pp"
+FuncionDeComparacion: 		;Compara los registros r12 y r13 y devuelve el correspondiente (segun el funcionamiento del programa) en el r13.
+	cmp r15, "Pp" 		;En la primera corrida, tengo que hacer que el ultimo mas grande/chico sea el actual
 	je primeraCorrida
 
 	mov r15b, byte[ordenarMayor]
@@ -312,7 +301,7 @@ FuncionDeComparacion: 		;Compara los registros r12 y r13 y devuelve el correspon
 
 	;; Si llego hasta aca, quiero ordenar descendete
 
-	jmp ComparacionDescendente ;TODO: Hacer Descendente
+	jmp ComparacionDescendente
 ComparacionAscendete:	
 	cmp r13b, r12b
 	jge actualizarNuevo
@@ -325,7 +314,7 @@ ComparacionDescendente:
 
 	;; Si llego hasta aca, signfica que no quiero actualizar nada
 	jmp FinComparacion
-actualizarNuevo:
+actualizarNuevo:		;Esta rutina se encarga de actualizar el ultimo mas grande/chico
 	mov r13, r12
 	sub r8, r8
 	mov r8b, byte[posActual]
@@ -336,9 +325,8 @@ FinComparacion:
 ret
 
 	;; Funcion que calcula el desplazamiento
-desplazamiento:			;Esta funcion me deja en el rax el desplazamiento que quiero y en el rbx actualiza la localizacion. Recibe en el registro rbx la posicion actual
+desplazamiento:			;Esta funcion me deja en el rax el desplazamiento que quiero. Recibe en el registro rbx la posicion actual
 	;; Calcular desplazamiento en un vector (i - 1) * longElemento
-	;; i empieza en 1
 
 	sub rax, rax		
 	mov rax, rbx 		; Esta parte se encarga del i - 1 
@@ -398,7 +386,7 @@ hagoSwap:
 	;; Aca hago el SWAP
 	sub r13, r13
 	sub rbx, rbx
-	mov bl, byte[corrida]
+	mov bl, byte[corrida] 	;Me fijo cual es elemento que tengo que intercambiar con el minimo
 	sub rsp, 8
 	call desplazamiento
 	add rsp, 8
@@ -413,22 +401,9 @@ hagoSwap:
 	add rsp, 8
 	mov r12b, byte[vector + eax]	;En r12 me guardo el de la posicion a Cambiar
 
+	;; Intercambio, equivalente a: a, b = b, a 
 	mov byte[vector + eax], r13b
-	
 	mov byte[vector + r8], r12b
-
-	
-	
-	;; sub rax,rax
-	;; mov rax, r13
-	
-	;; sub r13, r13
-	;; mov r13b, [vector + rbx]
-	
-	;; mov r8b, [posACambiar] 
-	;; mov [vector + r8], r13b
-	
-	;; mov [vector + rbx], al
 
 ret
 
