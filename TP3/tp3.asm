@@ -76,7 +76,7 @@ section 	.bss ;Seccion sin valor por defecto
 	numeroInt resb 1
 
 	;; Variables del vector
-	vector resb 30
+	vector times 30 resb 1
 	cantidadElementos resb 1
 	cantidadElementosTotales resb 1
 	
@@ -218,7 +218,7 @@ almacenarDatos: 		;TODO: Chequear que anden negativos
 
 	inc byte[posActual]	;Quiero que el proximo elemento se almacene en la proxima posicion
 
-	mov [vector + rax], r12b
+	mov [vector + eax], r12b
 	
 	jmp almacenarDatos
 	
@@ -291,7 +291,7 @@ buscarElMinimo:
 	;; inc byte[posActual]     ;Actualizo la posicion actual que me devuelve desplazamiento 
 	
 	sub r12, r12		;Esto me deja el item del vector en r12
-	mov r12b, byte[vector + rax];
+	mov r12b, byte[vector + eax];
 
 	;; Si llego aca, tengo en el r12 el valor actual
 	sub rsp, 8
@@ -319,13 +319,13 @@ FuncionDeComparacion: 		;Compara los registros r12 y r13 y devuelve el correspon
 	jmp ComparacionDescendente ;TODO: Hacer Descendente
 ComparacionAscendete:	
 	cmp r13b, r12b
-	jg actualizarNuevo
+	jge actualizarNuevo
 
 	;; Si llego hasta aca, signfica que no quiero actualizar nada
 	jmp FinComparacion
 ComparacionDescendente:
 	cmp r13b, r12b
-	jl actualizarNuevo
+	jle actualizarNuevo
 
 	;; Si llego hasta aca, signfica que no quiero actualizar nada
 	jmp FinComparacion
@@ -382,7 +382,7 @@ loopImpresion:
 	
 	sub rsi, rsi
 	mov rdi, msjVerVector
-	mov sil, byte[vector + rax]
+	mov sil, byte[vector + eax]
 	sub rsp, 8
 	call printf
 	add rsp, 8
@@ -406,7 +406,7 @@ hagoSwap:
 	sub rsp, 8
 	call desplazamiento
 	add rsp, 8
-	mov r13b, byte[vector + rax]	;En r13 me guardo la corrida, que es el que tengo que cambiar
+	mov r13b, byte[vector + eax]	;En r13 me guardo la corrida, que es el que tengo que cambiar
 	mov r8, rax 		;Me guardo el desplazamiento en el r8
 	
 	sub r12, r12
@@ -415,9 +415,9 @@ hagoSwap:
 	sub rsp, 8
 	call desplazamiento
 	add rsp, 8
-	mov r12b, byte[vector + rax]	;En r12 me guardo el de la posicion a Cambiar
+	mov r12b, byte[vector + eax]	;En r12 me guardo el de la posicion a Cambiar
 
-	mov byte[vector + rax], r13b
+	mov byte[vector + eax], r13b
 	
 	mov byte[vector + r8], r12b
 
