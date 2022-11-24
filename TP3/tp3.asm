@@ -11,7 +11,7 @@
 ;; 16 caracteres 1 y 0. Se aconseja el uso de un editor hexadecimal.
 
 global main
-; Imports de funciones de C (por defecto se importan todas, comentar con ";" para excluirlas)
+; Imports de funciones de C 
 extern puts
 extern gets
 extern printf
@@ -28,7 +28,7 @@ section 	.data ;Seccion con valores pre establecidos
 	msjPedirArchivo db "Bienvenido al Ordenador 3000 Ultra, necesito que me indiques que archivo queres que ordene.", 0
 	msjErrorNoExisteArchivo db "ERROR: El archivo ingresado no existe, por fvor ingresar un archivo presente en el directorio actual", 0
 	
-	msjMayorOMenor db "Como queres que ordene tu archivo? De manera ascendenteo (1) descendente (0)?", 0
+	msjMayorOMenor db "Como queres que ordene tu archivo? De manera Ascendente (1) o Descendente (0)?", 0
 	msjRtaInvalida db "ERROR: Rta invalida, por favor responder 1 o 0", 0
 
 	msjVerVectorInfo db `                 Iteracion: %hhi \n`,0
@@ -246,7 +246,6 @@ iteracion:
 	call hagoSwap 		;Esta funcion se encarga de hacer el intercambio entre la posicion actual y el minimo/maximo
 	add rsp, 8
 
-
 	sub rsp, 8
 	call imprimirVector 	;Muestro como quedo el vector despues del swapeo
 	add rsp, 8
@@ -317,7 +316,6 @@ actualizarNuevo:		;Esta rutina se encarga de actualizar el ultimo mas grande/chi
 	sub r8, r8
 	mov r8b, byte[posActual]
 	mov byte[posACambiar], r8b
-	;; dec byte[posACambiar]	;Correcion TODO: Chequear
 	
 FinComparacion:	
 ret
@@ -339,18 +337,17 @@ ret
 	;; Rutina que se encarga de imprimir el vector
 imprimirVector:
 	mov r9, [corrida]
-	inc r9
+	inc r9 			;Incremento el valor de la corrida solo para que el usuario la vea. 
 
 	mov rdi, msjVerVectorInfo
 	mov rsi, r9
 	sub rsp, 8
-	call printf
+	call printf 		;Muestro por que corrida va el programa
 	add rsp, 8
 
 	
 	mov r12b, byte[cantidadElementosTotales]
-	;; inc r12 		;Sumamos uno porque sino solo hace 9 corridas
-	mov rcx, r12
+	mov rcx, r12 		;Voy a mostrar tantos items como elementos tenga el vector
 loopImpresion:	
 	mov r12, rcx
 	
@@ -373,9 +370,8 @@ loopImpresion:
 	call printf
 	add rsp, 8
 
-	;; dec r12
 	mov rcx, r12
-	loop loopImpresion
+	loop loopImpresion 	;Hago este loop hasta no tener mas items que mostrar
 
 	mov rdi, msjEspacio
 	sub rsp, 8
